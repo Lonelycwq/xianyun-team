@@ -1,6 +1,6 @@
 <template>
   <div class="detail-aside">
-    <h3>相关攻略</h3>
+    <h3>错误相关攻略</h3>
     <div>
       <nuxt-link v-for="(item, index) in data" :key="index" class="aside-post" :to="`/post/detail?id=${item.id}`">
         <el-row type="flex" class="aside-list">
