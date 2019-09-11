@@ -1,65 +1,58 @@
 <template>
-  <div class="aside">
-    <div class="statement">
-      <el-row type="flex" justify="space-between" class="statement-list">
-        <el-col :span="8">
-          <i class="iconfont iconweibiaoti-_huabanfuben" style="color:#409EFF;" />
-          <span>航协认证</span>
-        </el-col>
-        <el-col :span="8">
-          <i class="iconfont iconbaozheng" style="color:green;" />
-          <span>出行保证</span>
-        </el-col>
-        <el-col :span="8">
-          <i class="iconfont icondianhua" style="color:#409EFF;" />
-          <span>7x24</span>
-        </el-col>
-      </el-row>
-      <p class="service-tel">
-        免费客服电话：4006345678转2
-      </p>
-    </div>
+    <div class="aside">
+        <div class="statement">
+            <el-row type="flex" justify="space-between" class="statement-list">
+                <el-col :span="8">
+                    <i class="iconfont iconweibiaoti-_huabanfuben" style="color:#409EFF;"></i>
+                    <span>航协认证</span>
+                </el-col>
+                <el-col :span="8">
+                    <i class="iconfont iconbaozheng" style="color:green;"></i>
+                    <span>出行保证</span>
+                </el-col>
+                <el-col :span="8">
+                    <i class="iconfont icondianhua" style="color:#409EFF;"></i>
+                    <span>7x24</span>
+                </el-col>
+            </el-row>
+            <p class="service-tel">
+                免费客服电话：4006345678转2
+            </p>
+        </div>
 
-    <div class="history">
-      <h5>历史查询</h5>
-      <nuxt-link
-        v-for="(item,index) in historyList"
-        :key="index"
-        :to="`/air/flights?departCity=${item.departCity}&departCode=${item.departCode}&destCity=${item.destCity}&destCode=${item.destCode}&departDate=${item.departDate}`"
-      >
-        <el-row
-          type="flex"
-          justify="space-between"
-          align="middle"
-          class="history-item"
-        >
-          <div class="air-info">
-            <div class="to-from">
-              {{ item.departCity }} - {{ item.destCity }}
-            </div>
-            <p>{{ item.departDate }}</p>
-          </div>
-          <span>选择</span>
-        </el-row>
-      </nuxt-link>
+        <div class="history">
+            <h5>历史查询</h5>
+            <nuxt-link 
+            v-for="(item, index) in history"
+            :key="index"
+           :to="`/air/flights?departCity=${item.departCity}&departCode=${item.departCode}&destCity=${item.destCity}&destCode=${item.destCode}&departDate=${item.departDate}`">
+                <el-row type="flex" 
+                justify="space-between" 
+                align="middle"
+                class="history-item">
+                    <div class="air-info">
+                        <div class="to-from">{{item.departCity}} - {{item.destCity}}</div>
+                        <p>{{item.departDate}}</p>
+                    </div>
+                    <span>选择</span>
+                </el-row>
+            </nuxt-link>
+        </div>
     </div>
-  </div>
 </template>
 
 <script>
 export default {
-  data () {
-    return {
-      historyList: []
+    data(){
+        return {
+            history: []
+        }
+    },
+    mounted(){
+        // 获取本地的搜索的历史记录
+        const arr = JSON.parse(localStorage.getItem("airs")) || [];
+        this.history = arr;
     }
-  },
-  mounted () {
-    const arr = localStorage.airs ? JSON.parse(localStorage.airs) : []
-    if (arr.length > 5) {
-      arr.reverse().splice(5)
-    }
-    this.historyList = arr
-  }
 }
 </script>
 

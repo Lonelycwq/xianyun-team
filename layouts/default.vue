@@ -1,23 +1,34 @@
 <template>
   <div>
-    <Header />
-    <!-- 页面占位符 -->
+    <!-- 渲染头部组件 -->
+    <Header/>
+
+    <!-- 页面的占位符,类似于router-view -->
     <nuxt />
-    <Footer />
+
+    <!-- 渲染页脚组件 -->
+    <Footer/>
   </div>
 </template>
+
 <script>
-// 引入头部组件
-import Header from '@/components/header'
-import Footer from '@/components/footer'
+
+//导入header头部组件
+import Header from "@/components/header";
+// 导入footer页脚组件
+import Footer from "@/components/footer";
+
 export default {
+  
   // 注册组件
   components: {
-    Header, Footer
-  }
+    Header,
+    Footer
+  },
 }
 </script>
-<style>
+
+<style >
 html {
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
     Roboto, 'Helvetica Neue', Arial, sans-serif;
@@ -29,22 +40,26 @@ html {
   -webkit-font-smoothing: antialiased;
   box-sizing: border-box;
 }
+
 *{
-  padding: 0;
-  margin: 0;
+  margin:0;
+  padding:0;
 }
+
 ul,li,ol{
   list-style: none;
 }
+
 i,em{
   font-style: normal;
 }
+
 a{
-  /* 继承父级属性 */
-  color: inherit;
+  color:inherit; 
   text-decoration: none;
 }
+
 a:hover{
-  text-decoration: none;
+  color:inherit; 
 }
 </style>

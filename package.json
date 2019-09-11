@@ -1,15 +1,14 @@
 {
-  "name": "travel-xianyun",
+  "name": "xianyun",
   "version": "1.0.0",
-  "description": "My best Nuxt.js project",
-  "author": "孤城白云帝",
+  "description": "My swell Nuxt.js project",
+  "author": "诸葛建国",
   "private": true,
   "scripts": {
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate",
-    "lint": "eslint --ext .js,.vue --ignore-path .gitignore ."
+    "generate": "nuxt generate"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.3.6",
@@ -21,22 +20,5 @@
     "qrcode": "^1.4.1",
     "vuex-persistedstate": "^2.5.4"
   },
-  "devDependencies": {
-    "@nuxtjs/eslint-config": "^1.0.1",
-    "@nuxtjs/eslint-module": "^1.0.0",
-    "babel-eslint": "^10.0.1",
-    "eslint": "^6.1.0",
-    "eslint-plugin-nuxt": ">=0.4.2"
-  },
-  "main": "nuxt.config.js",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Lonelycwq/xinayun.git"
-  },
-  "keywords": [],
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Lonelycwq/xinayun/issues"
-  },
-  "homepage": "https://github.com/Lonelycwq/xinayun#readme"
+  "devDependencies": {}
 }

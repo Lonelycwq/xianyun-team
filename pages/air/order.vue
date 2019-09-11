@@ -1,26 +1,25 @@
 <template>
-  <div class="container">
-    <el-row type="flex" justify="space-between">
-      <!-- 订单表单 -->
-      <OrderForm class="main" />
+    <div class="container">
+        <el-row type="flex" justify="space-between">
+            <!-- 订单表单 -->
+            <OrderForm/>
 
-      <!-- 侧边栏 -->
-      <OrderAside :data="$store.state.air.infoData" class="aside" />
-    </el-row>
-  </div>
+            <!-- 侧边栏 -->
+            <OrderAside :data="$store.state.air.infoData"/>
+        </el-row>
+    </div>
 </template>
 
 <script>
-import OrderForm from '@/components/air/orderForm'
-import OrderAside from '@/components/air/orderAside'
+import OrderForm from "@/components/air/orderForm.vue";
+import OrderAside from "@/components/air/orderAside.vue";
+
 export default {
-  components: {
-    OrderForm, OrderAside
-  },
-  data () {
-    return {
+    components: {
+        OrderForm,
+        OrderAside
     }
-  }
+    
 }
 </script>
 
@@ -29,7 +28,7 @@ export default {
         width:1000px;
         margin:20px auto;
     }
-
+    
     /*aside*/
     .aside{
         width: 350px;
