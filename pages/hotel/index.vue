@@ -1,6 +1,5 @@
 <template>
   <div>
-    酒店首页
     <!-- 酒店列表 -->
     <HotelList :data="hotelData"/>
   </div>
@@ -26,7 +25,6 @@ export default {
         city: this.$route.query.city
       }
     }).then(res=>{
-      console.log(res);
       this.hotelData = res.data
     })
   }
