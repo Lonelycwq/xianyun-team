@@ -99,10 +99,12 @@
 <script>
 export default {
   props:{
+    // 父组件传的列表总数据
     data:{
       type:Array,
       default:[]
     },
+    // 父组件传的总数据条数
     total:{
       type:Number,
       default:0
@@ -110,25 +112,37 @@ export default {
   },
   data(){
     return {
+      // 需要传给父组件的数据集合
       pageList:{
+        // 用哪条数据开始
         page_start: 0,
+        // 每页显示多少条数据
         pageSize: 2,
+        // 当前页码
         pageNum: 1,
       }
     }
   },
   methods:{
+    // 选择每页显示数据条数
     handleSizeChange(val) {
+      // 每页显示条数赋值
       this.pageList.pageSize = val
+      // 开始数据从0开始
       this.pageList.page_start = 0
+      // 当前页码为1
       this.pageList.pageNum = 1
+      // 传递事件以及数据给父组件
       this.$emit('setPage',this.pageList)
     },
+    // 切换页码事件
     handleCurrentChange(val) {
+      // 给当前页码赋值
       this.pageList.pageNum = val
+      // 计算出数据从哪条开始
       this.pageList.page_start = (val - 1) * this.pageList.pageSize
+      // 传递事件以及数据给父组件
       this.$emit('setPage',this.pageList)
-      console.log(this.pageList)
     }
   }
 }

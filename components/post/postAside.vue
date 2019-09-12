@@ -9,9 +9,9 @@
         </ul>
         <div v-show="showindex" class="children">
           <div v-for="(childitem,index2) in childrenList" :key="index2" class="childitem">
-            <span class="span1" @click="setCity(childitem.city)">{{ index2+1 }}</span>
-            <span class="span2" @click="setCity(childitem.city)">{{ childitem.city }}</span>
-            <span class="span3" @click="setCity(childitem.city)">{{ childitem.desc }}</span>
+            <nuxt-link class="span1" :to="`/post?city=${childitem.city}`">{{ index2+1 }}</nuxt-link>
+            <nuxt-link class="span2" :to="`/post?city=${childitem.city}`">{{ childitem.city }}</nuxt-link>
+            <nuxt-link class="span3" :to="`/post?city=${childitem.city}`">{{ childitem.desc }}</nuxt-link>
           </div>
         </div>
       </div>
@@ -34,27 +34,30 @@ export default {
     }
   },
   methods:{
+    // 鼠标离开事件隐藏弹出
     childhide() {
       this.showindex = false
     },
+    // 鼠标移入事件显示对应弹出并设置展示数组
     childshow(e) {
       this.showindex = true
+      // 判断鼠标移入的目标没有id则设置默认索引的数值数据
       if (!e.target.dataset.id) {
         this.childrenList = this.menuList[this.currentIndex].children
       } else {
+        // 有id则将这个id设置为索引，然后重新获取数组
         this.currentIndex = e.target.dataset.id
         this.childrenList = this.menuList[this.currentIndex].children
       }
-    },
-    setCity(city){
-      this.$emit('setCity',city)
     }
   },
   mounted(){
+    // 发送请求获取侧边栏数据
     this.$axios({
       url: '/posts/cities'
     }).then((res) => {
       // console.log(res)
+      // 数组赋值
       this.menuList = res.data.data
     }).catch((err) => {
       console.log(err)
