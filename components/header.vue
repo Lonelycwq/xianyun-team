@@ -1,43 +1,47 @@
 <template>
   <div class="container">
-      <!-- justify-content:space-between; 左右贴边对齐 -->
-      <!-- 文档： https://element.eleme.cn/#/zh-CN/component/layout#dui-qi-fang-shi -->
-      <el-row type="flex" class="main" justify="space-between">
-          <!-- logo -->
-          <div class="logo">
-              <img src="http://157.122.54.189:9093/images/logo.jpg" alt="">
-          </div>
+    <!-- justify-content:space-between; 左右贴边对齐 -->
+    <!-- 文档： https://element.eleme.cn/#/zh-CN/component/layout#dui-qi-fang-shi -->
+    <el-row type="flex" class="main" justify="space-between">
+      <!-- logo -->
+      <div class="logo">
+        <img src="http://157.122.54.189:9093/images/logo.jpg" alt="">
+      </div>
 
 
-          <el-row type="flex" class="navs">
-              <!-- nuxt-link的作用和使用方式和router-link -->
-              <nuxt-link to="/">首页</nuxt-link>
-              <nuxt-link to="/post"> 旅游攻略</nuxt-link>
-              <nuxt-link to="/hotel"> 酒店</nuxt-link>
-              <nuxt-link to="/air"> 国内机票</nuxt-link>
-          </el-row>
-
-          <!-- 登录跳转 -->
-          <div v-if="!$store.state.user.userInfo.token">
-              <nuxt-link to="/user/login">登录 / 注册</nuxt-link> 
-          </div>
-
-          <div v-else>
-               <el-dropdown>
-                    <span class="el-dropdown-link">
-                        <!-- 头像,昵称 -->
-                        <img :src="` ${$axios.defaults.baseURL}${$store.state.user.userInfo.user.defaultAvatar} `">
-                        <span>{{$store.state.user.userInfo.user.nickname}}</span>
-                        <i class="el-icon-arrow-down el-icon--right"></i>
-                    </span>
-                    <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item>个人中心</el-dropdown-item>
-                        <!-- click.native 给第三方组件添加事件需要加上native -->
-                        <el-dropdown-item @click.native="handleLogout">退出</el-dropdown-item>
-                    </el-dropdown-menu>
-                </el-dropdown>
-          </div>
+      <el-row type="flex" class="navs">
+        <!-- nuxt-link的作用和使用方式和router-link -->
+        <nuxt-link to="/">首页</nuxt-link>
+        <nuxt-link to="/post"> 旅游攻略</nuxt-link>
+        <nuxt-link to="/hotel"> 酒店</nuxt-link>
+        <nuxt-link to="/air"> 国内机票</nuxt-link>
       </el-row>
+
+      <!-- 登录跳转 -->
+      <div v-if="!$store.state.user.userInfo.token">
+        <nuxt-link to="/user/login">登录 / 注册</nuxt-link> 
+      </div>
+
+      <div v-else>
+        <el-dropdown>
+          <span class="el-dropdown-link">
+            <!-- 头像,昵称 -->
+            <img :src="` ${$axios.defaults.baseURL}${$store.state.user.userInfo.user.defaultAvatar} `">
+            <span>{{$store.state.user.userInfo.user.nickname}}</span>
+            <i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>
+              <nuxt-link to="/user/center.vue">
+                个人中心
+              </nuxt-link>
+            </el-dropdown-item>
+            <!-- click.native 给第三方组件添加事件需要加上native -->
+            <el-dropdown-item @click.native="handleLogout">退出</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </div>
+    </el-row>
   </div>
 </template>
 
