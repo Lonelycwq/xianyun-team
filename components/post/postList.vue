@@ -41,7 +41,7 @@
               </el-row>
             </div>
           </el-row>
-          <div v-else>
+          <div v-else-if="item.images.length>2">
             <div class="post-title">
               <nuxt-link :to="`/post/detail?id=${item.id}`">
                 {{ item.title }}
@@ -59,6 +59,37 @@
                 </nuxt-link>
               </el-col>
             </el-row>
+            <el-row type="flex" justify="space-between" align="middle" class="post-info">
+              <el-row type="flex" justify="space-between" align="middle">
+                <span><i class="el-icon-location-outline" />{{ item.cityName }}</span>
+                <nuxt-link to="">
+                  <el-row type="flex" justify="space-between" align="middle" class="post-user">
+                    <span>by</span>
+                    <img class="user-img" :src="`${$axios.defaults.baseURL}${item.account.defaultAvatar}`" alt="">
+                    <span class="username">
+                      <nuxt-link to="/user/center">
+                        {{ item.account.nickname }}
+                      </nuxt-link>
+                    </span>
+                  </el-row>
+                </nuxt-link>
+                <span><i class="el-icon-view" />{{ item.watch }}</span>
+              </el-row>
+              <span v-if="item.like" style="color:orange;font-size:14px;">{{ item.like }}点赞</span>
+              <span v-else style="color:orange;font-size:14px;">0 点赞</span>
+            </el-row>
+          </div>
+          <div v-else>
+            <div class="post-title">
+              <nuxt-link :to="`/post/detail?id=${item.id}`">
+                {{ item.title }}
+              </nuxt-link>
+            </div>
+            <div class="post-content">
+              <nuxt-link :to="`/post/detail?id=${item.id}`">
+                {{ item.summary }}
+              </nuxt-link>
+            </div>
             <el-row type="flex" justify="space-between" align="middle" class="post-info">
               <el-row type="flex" justify="space-between" align="middle">
                 <span><i class="el-icon-location-outline" />{{ item.cityName }}</span>
