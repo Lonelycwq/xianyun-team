@@ -24,22 +24,23 @@
             <el-row type="flex" justify="bespace-between">
               <el-col :span="5" class="ctrl-text">
                 <i class="iconfont iconpinglun" />
-                <p>评论</p>
+                <p>评论({{total}})</p>
               </el-col>
-              <el-col :span="5" class="ctrl-text">
+              <el-col :span="5" class="ctrl-text" @click.native="setStar">
                 <i class="iconfont iconstar1" />
                 <p>收藏</p>
               </el-col>
-              <el-col :span="5" class="ctrl-text">
+              <el-col :span="5" class="ctrl-text" @click.native="$message.warning('功能尚未开通')">
                 <i class="iconfont iconfenxiang" />
                 <p>分享</p>
               </el-col>
-              <el-col :span="5" class="ctrl-text">
+              <el-col :span="5" class="ctrl-text" @click.native="setLike">
                 <i class="iconfont iconding" />
-                <p>点赞</p>
+                <p>点赞({{ postInfo.like }})</p>
               </el-col>
             </el-row>
           </div>
+          <Comment @getTotal="getTotal"></Comment>
         </div>
       </div>
       <DetailAside :data="recommendList" class="aside" />
@@ -51,11 +52,13 @@
 // 引入momentjs插件
 import moment from 'moment'
 import DetailAside from '@/components/post/detailAside'
+import Comment from '@/components/post/comment'
 export default {
   components: {
-    DetailAside
+    DetailAside,Comment
   },
   filters: {
+    // 时间过滤
     time (value) {
       const filtersTime = moment(value).format(`YYYY-MM-DD HH:MM`)
       return filtersTime
@@ -63,28 +66,80 @@ export default {
   },
   data () {
     return {
+      // 当前文章数据
       postInfo: {},
-      recommendList: []
+      // 评论列表
+      recommendList: [],
+      // 文章id
+      postId: this.$route.query.id,
+      // 评论总数
+      total: 0
+    }
+  },
+  methods:{
+    // 文章点赞方法
+    setLike(){
+      this.$axios({
+        url: '/posts/like',
+        params: {id: this.postId},
+        // 给接口单独加上请求头
+        headers: {
+          Authorization: `Bearer ${this.$store.state.user.userInfo.token}`
+        },
+      })
+      .then((res)=>{
+        // console.log(res)
+        this.$message.success('点赞成功')
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+    },
+    // 文章收藏方法
+    setStar(){
+      this.$axios({
+        url: '/posts/star',
+        params: {id: this.postId},
+        // 给接口单独加上请求头
+        headers: {
+          Authorization: `Bearer ${this.$store.state.user.userInfo.token}`
+        },
+      })
+      .then((res)=>{
+        // console.log(res)
+        this.$message.success('收藏成功')
+      })
+      .catch((err)=>{
+        console.log(err)
+      })
+    },
+    // 接收子组件传递的评论总数
+    getTotal(val){
+      this.total = val
     }
   },
   mounted () {
+    // 根据文章id发送请求
     this.$axios({
       url: '/posts',
-      params: { id: this.$route.query.id }
+      params: { id: this.postId }
     })
       .then((res) => {
-        console.log(res)
+        // console.log(res)
+        // 文章数据赋值
         this.postInfo = res.data.data[0]
       })
       .catch((err) => {
         console.log(err)
       })
+      // 根据id推荐文章列表
     this.$axios({
       url: '/posts/recommend',
-      params: { id: this.$route.query.id }
+      params: { id: this.postId }
     })
       .then((res) => {
-        console.log(res)
+        // console.log(res)
+        // 推荐文章列表赋值
         this.recommendList = res.data.data
       })
       .catch((err) => {

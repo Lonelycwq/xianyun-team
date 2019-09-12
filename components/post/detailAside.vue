@@ -9,7 +9,7 @@
           </div>
           <el-row class="aside-post-right" type="flex">
             <div>{{ item.title }}</div>
-            <p><span>{{ item.updated_at | time }}</span></p>
+            <p><span>{{ item.updated_at | time }}</span>  <span>阅读：{{item.watch}}</span></p>
           </el-row>
         </el-row>
       </nuxt-link>
