@@ -12,7 +12,7 @@
       </div>
       <!-- 富文本框 -->
       <div id="richText">
-        <VueEditor :config="config" ref="vueEditor" v-model="addPostInfo.content" />
+        <VueEditor :config="config" ref="vueEditor"/>
       </div>
       <!-- 城市选择 -->
       <el-form-item label="选择城市">
@@ -68,7 +68,7 @@ export default {
         // 主题
         theme: "snow",
         uploadImage: {
-          url: "/upload",
+          url: "http://localhost:1337/upload",
           name: "files",
           uploadBefore(file) {
             return true;
@@ -83,7 +83,7 @@ export default {
 
         uploadVideo: {
           //url: "http://157.122.54.189:9095/upload",
-          url: "/upload",
+          url: "http://157.122.54.189:9095/upload",
           name: "files",
           uploadBefore(file) {
             return true;
