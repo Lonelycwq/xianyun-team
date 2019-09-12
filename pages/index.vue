@@ -43,9 +43,11 @@
             align="middle" 
             class="search-input">
                 <input 
-                :placeholder="options[current].placeholder" 
+                v-model="searchValue"
+                :placeholder="options[current].placeholder"
+                @keydown.enter="handleSearch" 
                 />
-                <i class="el-icon-search"></i>
+                <i class="el-icon-search" @click="handleSearch"></i>
             </el-row>
         </div>
     </div>
@@ -81,7 +83,8 @@ export default {
           placeholder: ""
         }
       ],
-
+      // 输入框内容
+      searchValue: '',
       // 当然的索引
       current: 0
     }
@@ -100,6 +103,14 @@ export default {
 
       // 把当前点击的索引赋值给current
       this.current = index;
+    },
+    handleSearch () {
+      // 判断当前索引值来知道搜索的是什么栏目
+      if (this.current === 0) {
+        this.$router.push(`/post?city=${this.searchValue}`)
+      } else if (this.current === 1) {
+        this.$router.push(`/hotel?city=${this.searchValue}`)
+      }
     }
   },
 
