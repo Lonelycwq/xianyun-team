@@ -101,7 +101,7 @@
     <div class="hotel_list">
       <div>
         <div class="hotel_item" 
-        v-for="(item,index) in data.data"
+        v-for="(item,index) in data"
         :key="index">
           <el-row>
             <el-col :span="8">
