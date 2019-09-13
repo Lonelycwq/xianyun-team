@@ -1,10 +1,7 @@
 <template>
   <div>
-<<<<<<< HEAD
-=======
     <!-- 酒店地图 -->
     <HotelMap :data="hotelData"/>
->>>>>>> d604b76b71db5d53b1790b01d0f3c0d76d9d1256
     <!-- 酒店列表 -->
     <HotelList :data="hotelData"/>
   </div>

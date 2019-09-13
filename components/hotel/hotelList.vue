@@ -100,13 +100,11 @@
     <!-- 酒店列表 -->
     <div class="hotel_list">
       <div>
-        <div class="hotel_item" 
-        v-for="(item,index) in data.data"
-        :key="index">
+        <div class="hotel_item" v-for="(item,index) in data" :key="index">
           <el-row>
             <el-col :span="8">
               <nuxt-link to="#">
-                <img class="pic" :src="`${item.photos}`" :alt="`${item.name}`">
+                <img class="pic" :src="`${item.photos}`" :alt="`${item.name}`" />
               </nuxt-link>
             </el-col>
             <el-col :span="10" style="padding-left:15px;">
@@ -114,9 +112,18 @@
                 <nuxt-link to="#" class="hotel_title">{{item.name}}</nuxt-link>
               </h4>
               <span class="pinyin">{{item.alias}}</span>
-              <i></i>
-              <i></i>
-              <i></i>
+              <!-- 酒店星级 -->
+              <span v-if="item.hotellevel" :title="`${item.hotellevel.name}级`">
+                <i 
+                data-v-7c1a9d7e 
+                class="iconfont iconhuangguan"
+                v-for="num in item.hotellevel.level"
+                :key="num"
+                ></i>
+              </span>
+
+              <!-- <i></i>
+              <i></i>-->
               <span class="pinyin">{{item.hoteltype.name}}</span>
               <div style="margin-top:15px;">
                 <el-col :span="10">
@@ -138,12 +145,12 @@
                 </el-col>
               </div>
               <div class="location-row">
-                <i class="iconfont iconlocation icon_style"></i>位于: {{item.address}}
+                <i class="iconfont iconlocation icon_style"></i>
+                位于: {{item.address}}
               </div>
             </el-col>
             <!-- 表格 -->
-            <el-col :span="6">
-            </el-col>
+            <el-col :span="6"></el-col>
           </el-row>
         </div>
       </div>
@@ -185,9 +192,9 @@ export default {
     this.$axios({
       url: "/hotels/options"
     }).then(res => {
-      //   console.log(res);
+      // console.log(res);
       this.hotelOption = res.data.data;
-      this.value
+      this.value;
       //   console.log(this.hotelOption);
     });
   }
@@ -235,21 +242,21 @@ export default {
     .hotel_item {
       padding: 25px 0;
       border-bottom: 1px solid rgb(238, 238, 238);
-      .hotel_title{
-          font-size: 24px;
-          font-weight: 400;
+      .hotel_title {
+        font-size: 24px;
+        font-weight: 400;
       }
-      .pinyin{
-          font-size: 16px;
-          color:#999;
+      .pinyin {
+        font-size: 16px;
+        color: #999;
       }
-      .location-row{
-          font-size: 14px;
-          color:#666;
+      .location-row {
+        font-size: 14px;
+        color: #666;
       }
-      .pic{
-          width: 100%;
-          height: 200px;
+      .pic {
+        width: 100%;
+        height: 200px;
       }
     }
   }
