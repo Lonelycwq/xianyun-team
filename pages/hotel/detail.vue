@@ -4,63 +4,42 @@
     <div class="hotel_breadcrumb">
       <el-breadcrumb separator-class="el-icon-arrow-right">
         <el-breadcrumb-item :to="{ path: '/hotel' }">酒店</el-breadcrumb-item>
-        <el-breadcrumb-item>南京酒店</el-breadcrumb-item>
-        <el-breadcrumb-item>xxx酒店</el-breadcrumb-item>
+        <el-breadcrumb-item :to="{ path: index!==(breadcrumbArr.length-1)?'/hotel':'#' }"
+        v-for="(item,index) in breadcrumbArr"
+        :key="index"
+        >{{item}}</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <!-- 酒店详情 -->
     <div class="hotel_detail">
       <div class="detail_info">
-        <h4 class="detail_name">得月楼饭店
+        <h4 class="detail_name">{{detailData.name}}
           <span class="crown">
-          <i class="iconfont icon-rank-2" style="color:#fe980e;margin-right:-5px;"></i>
-          <i class="iconfont icon-rank-2" style="color:#fe980e;margin-right:-5px;"></i>
-          <i class="iconfont icon-rank-2" style="color:#fe980e;margin-right:-5px;"></i>
-          <i class="iconfont icon-rank-2" style="color:#fe980e;margin-right:-5px;"></i>
-          <i class="iconfont icon-rank-2" style="color:#fe980e;margin-right:-5px;"></i>
+          <i class="iconfont icon-rank-2" style="color:#fe980e;margin-right:2px;"
+          v-for="index in level"
+          :key="index"
+          ></i>
         </span>
         </h4>
-        <p>de yue lou hotel</p>
+        <p>{{detailData.alias}}</p>
         <p class="detail_info_location">
-          <i class="iconfont icon-dingweiweizhi">柘宁东路9号</i>
+          <i class="iconfont icon-dingweiweizhi">{{detailData.address}}</i>
         </p>
       </div>
       <div class="detail_picture">
         <div class="main_display">
           <a href="javascript:void(0)">
-          <img src="http://157.122.54.189:9093/images/hotel-pics/6.jpeg" alt="得月楼饭店">
+          <img :src="detailData.photos" :alt="`${detailData.name}`">
           </a>
         </div>
         <div class="sub_display">
           <ul>
-            <li>
+            <li
+            v-for="(item,index) in detailData.pics"
+            :key="index"
+            >
               <a href="javascript:void(0)">
-              <img src="http://157.122.54.189:9093/images/hotel-pics/1.jpeg" alt="得月楼饭店">
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)">
-              <img src="http://157.122.54.189:9093/images/hotel-pics/2.jpeg" alt="得月楼饭店">
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)">
-              <img src="http://157.122.54.189:9093/images/hotel-pics/3.jpeg" alt="得月楼饭店">
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)">
-              <img src="http://157.122.54.189:9093/images/hotel-pics/4.jpeg" alt="得月楼饭店">
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)">
-              <img src="http://157.122.54.189:9093/images/hotel-pics/5.jpeg" alt="得月楼饭店">
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)">
-              <img src="http://157.122.54.189:9093/images/hotel-pics/6.jpeg" alt="得月楼饭店">
+              <img :src="`${ $axios.defaults.baseURL + item.url}`" :alt="`${detailData.name}`">
               </a>
             </li>
           </ul>
@@ -69,28 +48,61 @@
     </div>
     <!-- 酒店规格 -->
     <div class="hotel_size">
-      <el-table
+      <el-row class="size_head_row">
+        <el-col :span="10" class="info_col"><p>价格来源</p></el-col>
+        <el-col :span="10" class="info_col"><p>低价房型</p></el-col>
+        <el-col :span="4" class="info_col"><p>最低价格/每晚</p></el-col>
+      </el-row>
+      <el-row class="size_row"
+      v-for="(item,index) in sizeData"
+      :key="index"
+      >
+        <el-col :span="10" class="info_col">
+          <nuxt-link class="href_jump" to="#"><p>{{item.name}}</p>
+          </nuxt-link>
+        </el-col>
+        <el-col :span="10" class="info_col">
+          <nuxt-link class="href_jump" to="#"><p>{{item.bestType}}</p>
+          </nuxt-link>
+        </el-col>
+        <el-col :span="4" class="info_col">
+          <nuxt-link class="href_jump" to="#"><p>
+            <span style="font-size:17px;color:#f90"
+          >￥{{item.price}}</span>
+          <span style="color:#606266">起</span>
+          <i class="el-icon-arrow-right height-light" 
+          style="color:#f90"></i>
+          </p>
+          </nuxt-link>
+        </el-col>
+      </el-row>
+      <!-- <el-table
       :data="tableData"
-      style="width: 100%">
-      <el-table-column
-        prop="pathway"
-        label="价格来源"
-        width="420">
-      </el-table-column>
-      <el-table-column
-        prop="size"
-        label="低价房型"
-        width="420">
-      </el-table-column>
-      <el-table-column
-        prop="price"
-        label="最低价格/每晚">
-        <span style="font-size:17px;color:#f90">￥69</span>
-        <span style="color:#606266">起</span>
-        <i class="el-icon-arrow-right height-light" 
-        style="color:#f90"></i>
-      </el-table-column>
-    </el-table>
+      style="width: 100%"
+      >
+      
+        
+            <el-table-column
+          prop="name"
+          label="价格来源"
+          width="420">
+        </el-table-column>
+        <el-table-column
+          prop="bestType"
+          label="低价房型"
+          width="420">
+        </el-table-column>
+        <el-table-column
+          prop="price"
+          label="最低价格/每晚">
+            <span style="font-size:17px;color:#f90"
+          >￥{{item.price}}</span>
+          <span style="color:#606266">起</span>
+          <i class="el-icon-arrow-right height-light" 
+          style="color:#f90"></i>
+        </el-table-column>
+          
+    </el-table> -->
     </div>
     <!-- 酒店位置 -->
     <div class="hotel_location">
@@ -107,52 +119,65 @@
         <el-col :span="4" class="info_col" style="color:#000">基本信息</el-col>
         <el-col :span="20" class="info_col">
           <el-row>
-            <el-col :span="6" style="padding-left: 5px; padding-right: 5px;">入住时间：14：00之后</el-col>
-            <el-col :span="6" style="padding-left: 5px; padding-right: 5px;">离店时间：12：00之前</el-col>
-            <el-col :span="6" style="padding-left: 5px; padding-right: 5px;">2014年开业 / 2014年装修</el-col>
-            <el-col :span="6" style="padding-left: 5px; padding-right: 5px;">酒店规模：119间客房</el-col>
+            <el-col :span="6" style="padding-left: 5px; padding-right: 5px;">入住时间: {{detailData.enterTime !== 'null' ? detailData.enterTime:'14:00'}} 之后</el-col>
+            <el-col :span="6" style="padding-left: 5px; padding-right: 5px;">离店时间: {{detailData.leftTime !== 'null' ? detailData.leftTime:'12:00'}} 之前</el-col>
+            <el-col :span="6" style="padding-left: 5px; padding-right: 5px;">{{detailData.creation_time}} / {{detailData.renovat_time}}</el-col>
+            <el-col :span="6" style="padding-left: 5px; padding-right: 5px;">酒店规模: {{detailData.roomCount}}间客房</el-col>
           </el-row>
         </el-col>
       </el-row>
       <el-row class="info_row">
         <el-col :span="4" class="info_col" style="color:#000">主要设施</el-col>
         <el-col :span="20" class="info_col">
-          <el-row class="info_col_row">
-            <span class="info_tag">家电</span>
+          <el-row class="info_col_row"
+          v-if="hotelassets.length === 0"
+          >
+            <span>-</span>
+          </el-row>
+          <el-row class="info_col_row" v-else>
+            <span class="info_tag"
+            v-for="(item,index) in hotelassets"
+            :key="index"
+            >{{item}}</span>
           </el-row>
         </el-col>
       </el-row>
       <el-row class="info_row">
         <el-col :span="4" class="info_col" style="color:#000">停车服务</el-col>
         <el-col :span="20" class="info_col">
-          <el-row>-</el-row>
+          <el-row>{{detailData.parking !== null?detailData.parking:'-'}}</el-row>
         </el-col>
       </el-row>
       <el-row class="info_row">
         <el-col :span="4" class="info_col" style="color:#000">品牌信息</el-col>
         <el-col :span="20" class="info_col">
-          <el-row>-</el-row>
+          <el-row 
+          v-if="hotelbrand.name === ''"
+          >-</el-row>
+          <el-row 
+          v-else
+          >{{detailData.hotelbrand.name}}</el-row>
         </el-col>
       </el-row>
 
     </div>
     <!-- 用户评论 -->
     <div class="hotel_comments">
-      <h4 class="comments">0条真实用户评论</h4>
+      <h4 class="comments">{{detailData.all_remarks}}条真实用户评论</h4>
       <el-row class="comments_detail">
         <el-col :span="4" class="total_text">
-          <p>总评数:937</p>
-          <p>好评数:282</p>
-          <p>差评数:22</p>
+          <p>总评数 : {{detailData.all_remarks}}</p>
+          <p>好评数 : {{detailData.very_good_remarks}}</p>
+          <p>差评数 : {{detailData.very_bad_remarks}}</p>
         </el-col>
         <el-col :span="5" class="commen_star">
           <el-rate
-            v-model="value5"
+          v-model="starScore"
             disabled
             show-score
             allow-half
             text-color="#ff9900"
-            :score-template="`${value5}分`">
+            :score-template="`${starScore}分`">
           </el-rate>
           <div class="stamp">推荐</div>
         </el-col>
@@ -160,7 +185,7 @@
           <div class="sort_box">
             <el-progress 
               type="circle" 
-              :percentage="50" 
+              :percentage="progress.environment" 
               :width="70"
               :text-inside="true"
               :stroke-width="2"
@@ -170,7 +195,7 @@
                 </el-progress>
                 <div class="sort_text">
                   <p>环境</p>
-                  <p>8</p>
+                  <p>{{progress.environment/10}}</p>
                 </div>
           </div>
         </el-col>
@@ -178,7 +203,7 @@
           <div class="sort_box">
             <el-progress 
               type="circle" 
-              :percentage="50" 
+              :percentage="progress.product" 
               :width="70"
               :text-inside="true"
               :stroke-width="2"
@@ -188,7 +213,7 @@
                 </el-progress>
                 <div class="sort_text">
                   <p>产品</p>
-                  <p>8.3</p>
+                  <p>{{progress.product/10}}</p>
                 </div>
           </div>
         </el-col>
@@ -196,7 +221,7 @@
           <div class="sort_box">
             <el-progress 
               type="circle" 
-              :percentage="50" 
+              :percentage="progress.service" 
               :width="70"
               :text-inside="true"
               :stroke-width="2"
@@ -206,7 +231,7 @@
                 </el-progress>
                 <div class="sort_text">
                   <p>服务</p>
-                  <p>8.2</p>
+                  <p>{{progress.service/10}}</p>
                 </div>
           </div>
         </el-col>
@@ -217,28 +242,80 @@
 
 <script>
 export default {
+  // props: {
+  //   detailItem:{
+  //     type: Object,
+  //     default:{}
+  //   }
+  // },
   data() {
         return {
-          tableData: [
-            {
-            pathway: '携程',
-            size: '高级大床房A',
-            price: '￥69'
+          sizeData: [],
+          starScore:0,
+          detailData:{},
+          breadcrumbArr:[],
+          level:[],
+          hotelassets:[],
+          hotelbrand:{
+            name:''
           },
-            {
-            pathway: '携程',
-            size: '高级大床房A',
-            price: '￥69'
-          },
-            {
-            pathway: '携程',
-            size: '高级大床房A',
-            price: '￥69'
+          progress:{
+            environment:0,
+            product:0,
+            service:0
           }
-          ],
-          value5:4.2
         }
-      }
+  },
+  mounted(){
+    // 使用定时器添加个队列，确保获取数据之后再渲染页面
+    setTimeout(async ()=>{
+        await this.$axios({
+        url: '/hotels'
+        })
+        .then( res =>{
+          console.log(res)
+          if(res.status === 200 ){
+            const { data } = res.data
+            console.log(data)
+            // 暂取第一个酒店的数据
+            this.detailData = data[9]
+          }
+        } )
+        // 处理面包屑导航数据
+        this.breadcrumbArr = await this.detailData.breadcrumb.split(' > ')
+        if(this.detailData.hotellevel !== null ){
+          this.level.length = this.detailData.hotellevel.level
+        } else {
+          this.level.length = []
+        }
+        console.log(this.level)
+        // 处理酒店规格的数据
+        this.sizeData = this.detailData.products
+        // 处理酒店的主要设施的数据
+        this.hotelassets = this.detailData.hotelassets
+        // 处理酒店的品牌信息
+        if(this.detailData.hotelbrand !== null ){
+          this.hotelbrand = this.detailData.hotelbrand
+        }
+        // 处理星星评分的数据
+        this.starScore = this.detailData.stars
+        // 处理环境、产品、服务评分的数据
+        if(this.detailData.scores.environment !== null){
+          this.progress.environment = this.detailData.scores.environment * 10
+        }
+        if(this.detailData.scores.product !== null){
+          this.progress.product = this.detailData.scores.product * 10
+        }
+        if(this.detailData.scores.service !== null){
+          this.progress.service = this.detailData.scores.service * 10
+        }
+    },10)
+
+
+  },
+  methods:{
+
+  }
 }
 </script>
 
@@ -321,6 +398,39 @@ export default {
     }
     .hotel_size{
       margin: 50px 0px 40px;
+      font-size: 14px;
+      .size_head_row{
+        padding: 12px 0;
+        border-bottom: 1px rgb(235, 238, 245) solid;
+        box-sizing: border-box;
+        color:#909399;
+        font-family: "microsoft YaHei";
+        font-weight: 700;
+        p{
+          padding: 0 10px;
+          height: 23px;
+          line-height: 23px;
+        }
+      }
+      .size_row{
+        border-bottom: 1px rgb(235, 238, 245) solid;
+        box-sizing: border-box;
+        color:rgb(96, 98, 102);
+        font-family: "microsoft YaHei";
+        font-weight: normal;
+        .href_jump{
+            padding: 12px 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            p{
+              padding: 0 10px;
+              height: 23px;
+              line-height: 23px;
+            }
+        }
+        
+      }
     }
     .hotel_location{
       height: 360px;
