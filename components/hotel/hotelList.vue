@@ -101,7 +101,7 @@
     <!-- 酒店列表 -->
     <div class="hotel_list">
       <div>
-        <div class="hotel_item" v-for="(item,index) in data" :key="index">
+        <div class="hotel_item" v-for="(item,index) in data" :key="index" @click="handleHotelData(item)">
           <el-row>
             <el-col :span="8">
               <nuxt-link to="#">
@@ -202,7 +202,21 @@ export default {
     handleCommand(val) {
       // console.log(val);
       console.log(this.data);
+<<<<<<< HEAD
       this.levels = val;
+=======
+    },
+    // 传递数据给酒店详情页
+    handleHotelData(data){
+      this.$store.commit('hotel/setHotelData',data)
+      console.log(data)
+      const { id,name } = data
+      this.$router.push({
+        path:'/hotel/detail',
+        // query:data
+        query:{ id, name }
+      })
+>>>>>>> fe3032c225d8f002aa084f86f7cb5e04f4dc02b0
     }
   },
   mounted() {
