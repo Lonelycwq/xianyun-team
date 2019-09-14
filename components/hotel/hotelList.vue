@@ -99,11 +99,11 @@
       </el-row>
     </div>
     <!-- 酒店列表 -->
-    <div class="hotel_list">
+    <div class="hotel_list" v-if="dataList.length">
       <div>
         <div
           class="hotel_item"
-          v-for="(item,index) in data"
+          v-for="(item,index) in dataList"
           :key="index"
           @click="handleHotelData(item)"
         >
@@ -177,6 +177,16 @@
       </div>
     </div>
     <!-- 分页 -->
+    <el-pagination
+      small
+      @current-change="handleCurrentChange"
+      :current-page="pageIndex"
+      :page-size="pageSize"
+      layout="prev, pager, next"
+      :total="total"
+      prev-text="上一页"
+      next-text="下一页"
+    ></el-pagination>
   </div>
 </template>
 
@@ -184,6 +194,7 @@
 export default {
   data() {
     return {
+      //酒店选项
       hotelOption: {},
       products: [],
       //滑条
@@ -192,9 +203,14 @@ export default {
       levels: [], // 酒店等级
       types: [], // 酒店类型
       assets: [], // 酒店设施
-      brands: [] // 酒店品牌
+      brands: [], // 酒店品牌
       // //星级
       // value: 3.5
+      //分页
+      total: 0,
+      pageSize: 5,
+      pageIndex: 1,
+      dataList: []
     };
   },
   props: {
@@ -206,11 +222,8 @@ export default {
   methods: {
     //选择下拉菜单是触发
     handleCommand(val) {
-      // console.log(val);
       console.log(this.data);
-      // <<<<<<< HEAD
       this.levels = val;
-      // =======
     },
     // 传递数据给酒店详情页
     handleHotelData(data) {
@@ -219,10 +232,23 @@ export default {
       const { id, name } = data;
       this.$router.push({
         path: "/hotel/detail",
-        // query:data
         query: { id, name }
       });
-      // >>>>>>> fe3032c225d8f002aa084f86f7cb5e04f4dc02b0
+    },
+    //切换页数
+    handleCurrentChange(val) {
+      this.pageIndex = val;
+      // 按照数学公式切换dataList的值
+      this.dataList = this.data.slice(
+        (this.pageIndex - 1) * this.pageSize,
+        this.pageIndex * this.pageSize
+      );
+    },
+    //分页设置
+    setIndex() {
+      this.total = this.data.length;
+      this.dataList = this.data.slice(0, this.pageSize);
+      // console.log(this.dataList)
     }
   },
   mounted() {
@@ -230,10 +256,12 @@ export default {
     this.$axios({
       url: "/hotels/options"
     }).then(res => {
-      // console.log(res);
       this.hotelOption = res.data.data;
-      //   console.log(this.hotelOption);
+      setTimeout(() => {
+      this.setIndex()
+    }, 10);
     });
+    
   }
 };
 </script>
