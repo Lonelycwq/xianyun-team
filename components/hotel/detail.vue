@@ -29,18 +29,17 @@
       <div class="detail_picture">
         <div class="main_display">
           <a href="javascript:void(0)">
-          <img :src="picsArr[displayIndex]" :alt="`${detailData.name}`">
+          <img :src="detailData.photos" :alt="`${detailData.name}`">
           </a>
         </div>
         <div class="sub_display">
           <ul>
             <li
-            v-for="(item,index) in picsArr"
+            v-for="(item,index) in detailData.pics"
             :key="index"
-            @click="changePictureDisplay(index)"
             >
               <a href="javascript:void(0)">
-              <img :src="item" :alt="`${detailData.name}`">
+              <img :src="`${ $axios.defaults.baseURL + item.url}`" :alt="`${detailData.name}`">
               </a>
             </li>
           </ul>
@@ -77,6 +76,33 @@
           </nuxt-link>
         </el-col>
       </el-row>
+      <!-- <el-table
+      :data="tableData"
+      style="width: 100%"
+      >
+      
+        
+            <el-table-column
+          prop="name"
+          label="价格来源"
+          width="420">
+        </el-table-column>
+        <el-table-column
+          prop="bestType"
+          label="低价房型"
+          width="420">
+        </el-table-column>
+        <el-table-column
+          prop="price"
+          label="最低价格/每晚">
+            <span style="font-size:17px;color:#f90"
+          >￥{{item.price}}</span>
+          <span style="color:#606266">起</span>
+          <i class="el-icon-arrow-right height-light" 
+          style="color:#f90"></i>
+        </el-table-column>
+          
+    </el-table> -->
     </div>
     <!-- 酒店位置 -->
     <div class="hotel_location">
@@ -153,9 +179,7 @@
             text-color="#ff9900"
             :score-template="`${starScore}分`">
           </el-rate>
-          <div class="stamp"
-          v-show="starScore >= 3"
-          >推荐</div>
+          <div class="stamp">推荐</div>
         </el-col>
         <el-col :span="3" class="comment_sort">
           <div class="sort_box">
@@ -218,16 +242,14 @@
 
 <script>
 export default {
+  // props: {
+  //   detailItem:{
+  //     type: Object,
+  //     default:{}
+  //   }
+  // },
   data() {
         return {
-          picsArr:[
-            "http://157.122.54.189:9093/images/hotel-pics/2.jpeg",
-            "http://157.122.54.189:9093/images/hotel-pics/3.jpeg",
-            "http://157.122.54.189:9093/images/hotel-pics/4.jpeg",
-            "http://157.122.54.189:9093/images/hotel-pics/5.jpeg",
-            "http://157.122.54.189:9093/images/hotel-pics/6.jpeg"
-          ],
-          displayIndex:0,
           sizeData: [],
           starScore:0,
           detailData:{},
@@ -247,19 +269,26 @@ export default {
   mounted(){
     // 使用定时器添加个队列，确保获取数据之后再渲染页面
     setTimeout(async ()=>{
-        // 从store里面获取数据
-        this.detailData = this.$store.state.hotel.hotelData
+        await this.$axios({
+        url: '/hotels'
+        })
+        .then( res =>{
+          console.log(res)
+          if(res.status === 200 ){
+            const { data } = res.data
+            console.log(data)
+            // 暂取第一个酒店的数据
+            this.detailData = data[9]
+          }
+        } )
         // 处理面包屑导航数据
-        var arr = await this.detailData.breadcrumb.split(' > ')
-        this.breadcrumbArr.push(arr[0],arr[arr.length-1])
-        // 处理酒店星级皇冠图标的数据
+        this.breadcrumbArr = await this.detailData.breadcrumb.split(' > ')
         if(this.detailData.hotellevel !== null ){
           this.level.length = this.detailData.hotellevel.level
         } else {
           this.level.length = []
         }
-        // 处理展示图片的数据
-        this.picsArr.unshift(this.detailData.photos)
+        console.log(this.level)
         // 处理酒店规格的数据
         this.sizeData = this.detailData.products
         // 处理酒店的主要设施的数据
@@ -285,10 +314,7 @@ export default {
 
   },
   methods:{
-    // 处理更换显示展示图
-    changePictureDisplay(index){
-      this.displayIndex = index
-    }
+
   }
 }
 </script>
@@ -337,6 +363,16 @@ export default {
               content: '';
               clear: both;
             }
+            // >ul{
+            //   display: flex;
+            //   flex-wrap: wrap;
+            //   >li{
+            //     flex: 50%;
+            //     width: 160px;
+            //     height: 110px;
+
+            //   }
+            // }
             ul>li{
               float: left;
               margin-bottom: 15px;
@@ -354,7 +390,6 @@ export default {
               }
               a>img{
                 width: 100%;
-                height: 100%;
               }
             }
         }
