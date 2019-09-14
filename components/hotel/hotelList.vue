@@ -20,13 +20,14 @@
           <el-row class="level" type="flex">
             <el-dropdown style="width:100%;" @command="handleCommand">
               <div class="el-dropdown-text">
-                <span class="el-dropdown-link col_font">不限</span>
+                <span class="el-dropdown-link col_font">{{levels}}</span>
                 <i class="el-icon-arrow-down el-icon--right" style="align-self: center;"></i>
               </div>
               <el-dropdown-menu slot="dropdown" style="width:150px;">
                 <el-dropdown-item
                   v-for="(item,index) in hotelOption.levels"
                   :key="index"
+                  :command="item.name"
                 >{{item.name}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -114,11 +115,11 @@
               <span class="pinyin">{{item.alias}}</span>
               <!-- 酒店星级 -->
               <span v-if="item.hotellevel" :title="`${item.hotellevel.name}级`">
-                <i 
-                data-v-7c1a9d7e 
-                class="iconfont iconhuangguan"
-                v-for="num in item.hotellevel.level"
-                :key="num"
+                <i
+                  data-v-7c1a9d7e
+                  class="iconfont iconhuangguan"
+                  v-for="num in item.hotellevel.level"
+                  :key="num"
                 ></i>
               </span>
 
@@ -150,11 +151,26 @@
               </div>
             </el-col>
             <!-- 表格 -->
-            <el-col :span="6"></el-col>
+            <el-col :span="6">
+              <el-table :data="item.products" :show-header="false" style="margin-top:20px;">
+                <el-table-column prop="name"></el-table-column>
+                <el-table-column align="right">
+                  <template slot-scope="scope">
+                    <span data-v-0a769ebc="" 
+                    class="height-light larger"
+                    style="color: #f90;font-size: larger;"
+                    >￥{{scope.row.price}}</span>起
+                    <i data-v-0a769ebc="" class="el-icon-arrow-right"></i>
+                  </template>
+                </el-table-column>
+                <!-- <el-table-column prop="date"></el-table-column> -->
+              </el-table>
+            </el-col>
           </el-row>
         </div>
       </div>
     </div>
+    <!-- 分页 -->
   </div>
 </template>
 
@@ -163,15 +179,16 @@ export default {
   data() {
     return {
       hotelOption: {},
+      products: [],
       //滑条
       value2: 0,
       //多选条件
       levels: [], // 酒店等级
       types: [], // 酒店类型
       assets: [], // 酒店设施
-      brands: [], // 酒店品牌
-      //星级
-      value: 3.5
+      brands: [] // 酒店品牌
+      // //星级
+      // value: 3.5
     };
   },
   props: {
@@ -183,8 +200,9 @@ export default {
   methods: {
     //选择下拉菜单是触发
     handleCommand(val) {
-      console.log(val);
+      // console.log(val);
       console.log(this.data);
+      this.levels = val;
     }
   },
   mounted() {
@@ -194,7 +212,6 @@ export default {
     }).then(res => {
       // console.log(res);
       this.hotelOption = res.data.data;
-      this.value;
       //   console.log(this.hotelOption);
     });
   }
