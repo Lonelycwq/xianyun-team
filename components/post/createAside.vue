@@ -1,25 +1,66 @@
 <template>
   <div class="aside">
-    <h5>草稿箱（0）</h5>
-    <nuxt-link to="#" class="drestItem">
-      <!-- v-for="(item, index) in draft" :key="index" to="#" -->
+    <h5>草稿箱（{{draftArr.length || 0 }}）</h5>
+    <nuxt-link to="#" class="drestItem" v-for="(item,index) in draftArr" :key="index">
       <el-row type="flex" justify="space-between" align="middle">
-        <div class="formInfo">
+        <div class="formInfo" align="middle" @click="clickEdit(index)">
           <!-- 文章标题 -->
           <span>
-            文章标题
+            {{item.title}}
             <i class="el-icon-edit"></i>
           </span>
         </div>
+        <el-button type="danger" icon="el-icon-delete" size="mini" plain @click="clickDel(index)"></el-button>
       </el-row>
-    </nuxt-link>
+      
     <!-- 时间 -->
-    <span>2019-09-12</span>
+    <span>{{item.draftTime}}</span>
+    </nuxt-link>
   </div>
 </template>
 
 <script>
-export default {};
+export default {
+  data(){
+    return{
+      // 草稿数组
+      draftArr:[]
+    }
+  },
+  // 监听数据
+  watch:{
+    // ''引号=>深度监听的标志
+    '$store.state.post.draftPost'(){
+    const arr = this.$store.state.post.draftPost
+    // 赋值
+    this.draftArr = arr
+    }
+  },
+  mounted () {
+    // 从store获取草稿数据
+    const arr = this.$store.state.post.draftPost
+    // 赋值
+    this.draftArr = arr
+    // console.log(this.draftArr);
+  },
+  methods:{
+    // 点击草稿箱编辑
+    clickEdit(index){
+      // 把当前点击草稿的数据展现回表单
+      // const {title,content,city} = this.$store.state.post.draftPost[index];
+      // 把当前点击的草稿的值存到store
+      this.$store.commit('post/setNowDraft',this.$store.state.post.draftPost[index]);
+      return this.$store.state.post.draftPost[index]
+    },
+    // 点击删除草稿箱内容
+    clickDel(index){
+      // 根据索引删除当前点击的草稿=>深拷贝=>不能在mutations外面直接修改其state类型
+      var temp =[...this.$store.state.post.draftPost];
+      temp.splice(index,1)
+      this.$store.commit('post/DraftPost', temp)
+    }
+  }
+};
 </script>
 
 <style lang="less" scoped>

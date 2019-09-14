@@ -12,7 +12,7 @@
       </div>
       <!-- 富文本框 -->
       <div id="richText">
-        <VueEditor :config="config" ref="vueEditor"/>
+        <VueEditor :config="config" ref="vueEditor" />
       </div>
       <!-- 城市选择 -->
       <el-form-item label="选择城市">
@@ -30,7 +30,7 @@
       <!-- 按钮 -->
       <el-form-item>
         <el-button type="primary" @click="addPost">发布</el-button>
-        <el-button class="addArticle">保存到草稿</el-button>
+        <el-button class="addArticle" @click="draftPost">保存到草稿</el-button>
       </el-form-item>
     </el-form>
   </div>
@@ -98,13 +98,13 @@ export default {
       // 新增文章数据=>初始化
       addPostInfo: {
         title: "", // 文章标题
-        content:"", // 文章内容
-        city:0 // 城市名称
+        content: "", // 文章内容
+        city: null // 城市名称
       },
       // (城市名称)的城市id
-      cityName:"",
+      cityName: "",
       // 城市下拉数组
-      cityList:[]
+      cityList: []
     };
   },
   // 注册富文本框组件
@@ -132,7 +132,7 @@ export default {
         // 数组
         const { data } = res.data;
         // 城市id
-        this.addPostInfo.city = res.data.data[0].id
+        this.addPostInfo.city = res.data.data[0].id;
         // 给数组中每个对象添加value属性
         const newData = [];
         data.forEach(v => {
@@ -149,13 +149,13 @@ export default {
       });
     },
     // 目标城市下拉选择时触发
-    handleCitySelect(item){
+    handleCitySelect(item) {
       // 把选择的值设置给addPostInfo
       this.cityName = item.value;
     },
     // 城市输入框失去焦点时候触发
-    handleCityBlur(){
-      this.addPostInfo.city = this.cityList[0]?this.cityList[0].value:""
+    handleCityBlur() {
+      this.addPostInfo.city = this.cityList[0] ? this.cityList[0].value : "";
     },
     // 点击发布事件
     addPost() {
@@ -191,8 +191,48 @@ export default {
           type: "success"
         });
         // 跳转到攻略列表页
-        this.$router.push({path: "/post"})
+        this.$router.push({ path: "/post" });
       });
+    },
+    // 点击保存草稿事件
+    draftPost() {
+        this.addPostInfo.content = this.$refs.vueEditor.editor.root.innerHTML;
+        // 时间处理
+        let time = new Date();
+        // 转换时间格式
+        time =
+          time.getFullYear() +
+          "-" +
+          (time.getMonth() + 1) +
+          "-" +
+          time.getDate();
+        // console.log(this.draftTime);
+        // 把时间和表单数据合并添加到一个新的对象里
+        const newAddPostInfo = {
+          ...this.addPostInfo,
+          draftTime: time,
+          // 根据当前时间生成唯一的id
+          draftId: Date.now()
+        };
+        // 把表单清空=>重置表单
+        this.addPostInfo.title = "";
+        this.$refs.vueEditor.editor.root.innerHTML = "";
+        this.cityName = "";
+        this.addPostInfo.city = null;
+        this.addPostInfo.content = "";
+        // console.log(newAddPostInfo);
+        // 把值存到store
+        this.$store.commit("post/setDraftPost", newAddPostInfo);
+        return newAddPostInfo;
+    }
+  },
+  watch: {
+    "$store.state.post.nowDraft"() {
+      const newObj = this.$store.state.post.nowDraft;
+      // 赋值
+      this.addPostInfo.title = newObj.title;
+      this.$refs.vueEditor.editor.root.innerHTML = newObj.content;
+      this.cityName = newObj.city;
     }
   }
 };
