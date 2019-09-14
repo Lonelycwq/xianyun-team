@@ -101,7 +101,12 @@
     <!-- 酒店列表 -->
     <div class="hotel_list">
       <div>
-        <div class="hotel_item" v-for="(item,index) in data" :key="index" @click="handleHotelData(item)">
+        <div
+          class="hotel_item"
+          v-for="(item,index) in data"
+          :key="index"
+          @click="handleHotelData(item)"
+        >
           <el-row>
             <el-col :span="8">
               <nuxt-link to="#">
@@ -156,11 +161,12 @@
                 <el-table-column prop="name"></el-table-column>
                 <el-table-column align="right">
                   <template slot-scope="scope">
-                    <span data-v-0a769ebc="" 
-                    class="height-light larger"
-                    style="color: #f90;font-size: larger;"
+                    <span
+                      data-v-0a769ebc
+                      class="height-light larger"
+                      style="color: #f90;font-size: larger;"
                     >￥{{scope.row.price}}</span>起
-                    <i data-v-0a769ebc="" class="el-icon-arrow-right"></i>
+                    <i data-v-0a769ebc class="el-icon-arrow-right"></i>
                   </template>
                 </el-table-column>
                 <!-- <el-table-column prop="date"></el-table-column> -->
@@ -202,21 +208,21 @@ export default {
     handleCommand(val) {
       // console.log(val);
       console.log(this.data);
-<<<<<<< HEAD
+      // <<<<<<< HEAD
       this.levels = val;
-=======
+      // =======
     },
     // 传递数据给酒店详情页
-    handleHotelData(data){
-      this.$store.commit('hotel/setHotelData',data)
-      console.log(data)
-      const { id,name } = data
+    handleHotelData(data) {
+      this.$store.commit("hotel/setHotelData", data);
+      console.log(data);
+      const { id, name } = data;
       this.$router.push({
-        path:'/hotel/detail',
+        path: "/hotel/detail",
         // query:data
-        query:{ id, name }
-      })
->>>>>>> fe3032c225d8f002aa084f86f7cb5e04f4dc02b0
+        query: { id, name }
+      });
+      // >>>>>>> fe3032c225d8f002aa084f86f7cb5e04f4dc02b0
     }
   },
   mounted() {
