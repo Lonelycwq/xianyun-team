@@ -1,17 +1,17 @@
 <template>
   <div class="container">
     <h4>评论</h4>
-    <input type="text" placeholder="说点什么吧..." v-model="comment" >
+    <input type="text" placeholder="说点什么吧..." v-model="addCommentObj.content" >
     <div class="commit">
       <div class="upload">
         <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
+          action="http://127.0.0.1:1337/upload"
           list-type="picture-card"
-          :headers="addToken()"
           :on-preview="handlePictureCardPreview"
           :before-upload="beforeUpload"
           :on-remove="handleRemove"
           :on-success="handleSuccess"
+          name="files"
           >
           <i class="el-icon-plus"></i>
         </el-upload>
@@ -26,25 +26,33 @@
 
 <script>
 export default {
+  props:{
+    follow:{
+      type: Object,
+      default: {}
+    }
+  },
   data(){
     return {
-      comment:'',
-      pics:[],
-      post:this.$route.query.id,       //攻略id
+      addCommentObj:{
+        content:'',
+        pics:[],
+        post:this.$route.query.id,       //攻略id
+        follow: ''
+      },
       dialogImageUrl: '',
       dialogVisible: false
     }
   },
   methods:{
     // 设置请求头的token,文件上传组件内部封装了异步操作
-    addToken(){
-      let mytoken = this.$store.state.user.userInfo.token
-      return { Authorization: mytoken }
-    },
+    // addToken(){
+    //   let mytoken = this.$store.state.user.userInfo.token
+    //   return { Authorization: `Bearer ${mytoken}` }
+    // },
     // 文件上传之前的钩子，参数为上传的文件，若返回 false 或 Promise 且被 reject 则停车上传
     beforeUpload(file){
       // 上传格式为"image/",即图片格式
-      console.log(file)
       if(file.type.indexOf('image/') !== 0){
         this.$message.error('请上传正确格式的图片，如jpg/jpeg/png格式')
         return false
@@ -79,32 +87,29 @@ export default {
     // 文件上传成功时的钩子
     handleSuccess(response,file, fileList){
         if(file.status==='success'){
-          this.pics.push({url:file.url})
+          this.addCommentObj.pics.push(response[0])
         } else {
           this.$message.error('图片上传失败')
         }
     },
     submitComment(){
-      var data = {
-          comment:this.comment,
-          pics:this.pics,
-          post:this.post
-      }
-      console.log(data)
       this.$axios({
         url: "/comments",
-        header:{
-          'Content-Type':'application/json;charset=UTF-8',
+        method: 'post',
+        data:this.addCommentObj,
+        headers: {
+          'Content-Type':'application/json',
           Authorization: `Bearer ${this.$store.state.user.userInfo.token}`
-        },
-        data
+        }
       })
       .then( res=>{
-        console.log(res)
+        // console.log(res)
         if(res.status === 200 ){
           this.$message.success('新增成功！')
-          this.comment = '',
-          this.pics = []
+          this.addCommentObj.comment = '',
+          this.addCommentObj.follow = '',
+          this.addCommentObj.pics = []
+          this.$emit('updInit','')
         }
       })
     }

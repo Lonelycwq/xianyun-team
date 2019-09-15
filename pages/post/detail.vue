@@ -40,8 +40,6 @@
               </el-col>
             </el-row>
           </div>
-              <!-- 新增评论 -->
-        <AddNewComment></AddNewComment>
           <Comment @getTotal="getTotal"></Comment>
         </div>
       </div>
@@ -56,10 +54,9 @@
 import moment from 'moment'
 import DetailAside from '@/components/post/detailAside'
 import Comment from '@/components/post/comment'
-import AddNewComment from '@/components/post/addNewComment'
 export default {
   components: {
-    DetailAside,Comment,AddNewComment
+    DetailAside,Comment
   },
   filters: {
     // 时间过滤

@@ -1,5 +1,7 @@
 <template>
   <div class="comment-main">
+    <!-- 新增评论 -->
+    <AddNewComment @updInit='updInit' :follow="followObj"></AddNewComment>
     <div class="comment-list">
       <div v-for="(item, index) in commentList" :key="index" class="comment-detail">
         <div class="userInfo">
@@ -10,16 +12,19 @@
         </div>
         <div class="comment-content">
           <div class="user-floor">
-          <CommentList :data="item"></CommentList>
+          <CommentList :data="item" v-if="item.parent"></CommentList>
           </div>
           <div class="user-self">{{ item.content }}</div>
           <el-row type="flex" :gutter="15">
             <div class="comment-pic" v-for="(imgitem, index2) in item.pics" :key="index2">
-              <img :src="`${$axios.defaults.baseURL}${imgitem.url}`" alt="">
+              <img :src="`${$axios.defaults.baseURL}${imgitem.url}`" alt="" @click="showPic">
+              <el-dialog title="图片预览" :visible.sync="dialogPic">
+                <img :src="`${$axios.defaults.baseURL}${imgitem.url}`" alt="">
+              </el-dialog>
             </div>
           </el-row>
           <div class="comment-ctrl" @mousemove="reply=true" @mouseout="reply=false">
-            <nuxt-link v-show="reply" to="#">回复</nuxt-link>
+            <a v-show="reply" href="javascript:;" @click="replyById(item)">回复</a>
           </div>
         </div>
       </div>
@@ -39,6 +44,7 @@
 </template>
 
 <script>
+import AddNewComment from '@/components/post/addNewComment'
 import CommentList from '@/components/post/commentList'
 import moment from 'moment'
 export default {
@@ -55,11 +61,13 @@ export default {
       },
       pageNum: 1,
       total: 0,
-      reply: false
+      reply: false,
+      dialogPic: false,
+      followObj: {}
     }
   },
   components:{
-    CommentList
+    CommentList,AddNewComment
   },
   filters: {
     time (value) {
@@ -68,6 +76,9 @@ export default {
     }
   },
   methods:{
+    updInit(){
+      this.init()
+    },
     // 获取评论方法
     init(){
       this.$axios({
@@ -101,6 +112,14 @@ export default {
       // 计算出数据从哪条开始
       this.getCommentObj._start = (val - 1) * this.getCommentObj._limit
       this.init()
+    },
+    //打开图片预览模态框
+    showPic(){
+      this.dialogPic = true
+    },
+    //回复获取参数
+    replyById(item){
+      this.followObj = item
     }
   },
   mounted(){
@@ -146,6 +165,10 @@ export default {
         margin-top: 10px;
         padding: 5px;
         border: 1px dashed #ddd;
+        img{
+          width: 100%;
+          height: 100%;
+        }
       }
       .comment-ctrl{
         height: 20px;
