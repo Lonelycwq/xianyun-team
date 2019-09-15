@@ -13,11 +13,14 @@
         <div class="user-self">{{ data.content }}</div>
         <el-row type="flex" :gutter="15">
           <div class="comment-pic" v-for="(imgitem, index) in data.pics" :key="index">
-            <img :src="`${$axios.defaults.baseURL}${imgitem.url}`" alt="">
+            <img :src="`${$axios.defaults.baseURL}${imgitem.url}`" alt="" @click="showPic">
+            <el-dialog title="图片预览" :visible.sync="dialogPic">
+              <img :src="`${$axios.defaults.baseURL}${imgitem.url}`" alt="">
+            </el-dialog>
           </div>
         </el-row>
         <div class="comment-ctrl" @mousemove="reply=true" @mouseout="reply=false">
-          <a v-show="reply===true" href="javascript:viod(0)">回复</a>
+          <a v-show="reply" href="javascript:;">回复</a>
         </div>
       </div>
     </div>
@@ -37,7 +40,8 @@ export default {
   },
   data(){
     return {
-      reply: false
+      reply: false,
+      dialogPic: false
     }
   },
   components:{
@@ -49,7 +53,13 @@ export default {
       return filtersTime
     }
   },
+  methods:{
+    showPic(){
+      this.dialogPic = true
+    }
+  },
   mounted(){
+    console.log(this.data)
   }
 }
 </script>
@@ -93,6 +103,10 @@ export default {
         margin-top: 10px;
         padding: 5px;
         border: 1px dashed #ddd;
+        img{
+          width: 100%;
+          height: 100%;
+        }
       }
       .comment-ctrl{
         height: 20px;

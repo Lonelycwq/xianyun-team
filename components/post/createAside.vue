@@ -3,12 +3,15 @@
     <h5>草稿箱（{{draftArr.length || 0 }}）</h5>
     <nuxt-link to="#" class="drestItem" v-for="(item,index) in draftArr" :key="index">
       <el-row type="flex" justify="space-between" align="middle">
-        <div class="formInfo" align="middle" @click="clickEdit(index)">
+        <div class="formInfo" align="middle" @click="clickEdit(item)">
           <!-- 文章标题 -->
-          <span>
+          <el-row type="flex" justify="space-between" align="middle">
+            <p class="title">
             {{item.title}}
+            </p>
             <i class="el-icon-edit"></i>
-          </span>
+            
+          </el-row>
         </div>
         <el-button type="danger" icon="el-icon-delete" size="mini" plain @click="clickDel(index)"></el-button>
       </el-row>
@@ -45,12 +48,13 @@ export default {
   },
   methods:{
     // 点击草稿箱编辑
-    clickEdit(index){
+    clickEdit(item){
       // 把当前点击草稿的数据展现回表单
       // const {title,content,city} = this.$store.state.post.draftPost[index];
       // 把当前点击的草稿的值存到store
-      this.$store.commit('post/setNowDraft',this.$store.state.post.draftPost[index]);
-      return this.$store.state.post.draftPost[index]
+      // this.$store.commit('post/setNowDraft',this.$store.state.post.draftPost[index]);
+      // return this.$store.state.post.draftPost[index]
+      this.$emit('getItem',item)
     },
     // 点击删除草稿箱内容
     clickDel(index){
@@ -78,18 +82,32 @@ export default {
     border-bottom: 1px #eee solid;
   }
   .drestItem{
-    padding:10px 0;
+    display: block;
+    padding:5px 0;
     border-bottom: 1px #eee solid;
+    &:last-child{
+      border-bottom: none;
+      padding-bottom: 0;
+    }
     .formInfo{
-        padding: 8px 0;
-        span{
-            color:#000;
-           font-size: 16px;
-            &:hover{
-                color: orange;
-                text-decoration:underline;
-            }
-        }
+      width: 150px;
+      padding: 8px 0;
+      color:#000;
+      font-size: 16px;
+      &:hover{
+        color: orange;
+        text-decoration:underline;
+      }
+      .title{
+        width: 120px;
+        height: 24px;
+        text-align: left;
+        overflow: hidden;
+        &:hover{
+        color: orange;
+        text-decoration:underline;
+      }
+      }
     }
   }
   span{
