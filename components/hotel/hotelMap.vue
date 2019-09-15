@@ -34,13 +34,13 @@
       </el-col>
       <!-- 选择人数 -->
       <el-col :span="5">
-        <div class="grid-content bg-purple number-A" >
+        <div class="grid-content bg-purple number-A">
           <el-input
             placeholder="人数未定"
             suffix-icon="el-icon-date"
             v-model="inputPeople"
-            @focus="isShow=true"
-            @blur="click_P"
+            @click="click_P"
+            v-popover:popover2
           ></el-input>
         </div>
       </el-col>
@@ -52,8 +52,16 @@
       </el-col>
     </el-row>
     <!-- 人数未定拓展 -->
-    <el-card class="number-P clearfix" v-show="isShow">
-      <span>每间</span>
+    <el-popover
+      class="number-P clearfix"
+      ref="popover2"
+      placement="bottom"
+      width="300"
+      trigger="click"
+      content="这是一段内容,这是一段内容,这是一段内容,这是一段内容。"
+      style="width: 300px; transform-origin: center top; z-index: 2047; position: absolute; top: 156px; left: 622px;"
+    >
+      <span style="margin-left:-5px;margin-right:-5px;">每间</span>
       <el-select v-model="value1" placeholder="2成人" style="width: 85px" class="value1">
         <el-option
           v-for="item in options1"
@@ -74,7 +82,7 @@
         <span class="xian"></span>
         <el-button type="primary" class="sure_P">确定</el-button>
       </div>
-    </el-card>
+    </el-popover>
     <!-- 简介 -->
     <el-row>
       <div class="grid-content bg-purple">
@@ -89,8 +97,8 @@
                 </span>
               </span>
             </div>
-            <a href="#" @click="aaaa" class="pack_up" v-if="!isShow2">展开</a>
-            <a href="#" @click="aaaa" class="pack_up" v-if="isShow2">收起</a>
+            <a href="#" @click="click_down" class="pack_up" v-if="!isShow2">展开</a>
+            <a href="#" @click="click_down" class="pack_up" v-if="isShow2">收起</a>
             <!-- 攻略 -->
             <div>
               <span class="gl-1">攻略: &nbsp;&nbsp;</span>
@@ -99,19 +107,22 @@
               >北京，你想要的都能在这找到。博古通今，兼容并蓄，天下一城，如是帝都。 景点以故宫为中心向四处辐射；地铁便宜通畅，而且覆盖绝大多数景点。 由于早上有天安门升旗仪式，所以大多数人选择在天安门附近住宿。</span>
             </div>
             <!-- 均价 -->
-            <div>
-              均价:&nbsp;&nbsp;
-              <i class="iconfont iconhuangguan"></i>
-              <i class="iconfont iconhuangguan"></i>
-              <i class="iconfont iconhuangguan"></i>¥332
-              &nbsp;
-              <i class="iconfont iconhuangguan"></i>
-              <i class="iconfont iconhuangguan"></i>¥521
-              &nbsp;
-              <i class="iconfont iconhuangguan"></i>
-              <i class="iconfont iconhuangguan"></i>
-              <i class="iconfont iconhuangguan"></i>¥768
-            </div>
+            <el-tooltip class="item" effect="dark" content="等级评定是针对房价,设施和服务等各方面水平的综合评估" placement="top">
+              <div>
+                均价:
+                <span class="wenhaoSytle">?</span>&nbsp;&nbsp;
+                <i class="iconfont iconhuangguan"></i>
+                <i class="iconfont iconhuangguan"></i>
+                <i class="iconfont iconhuangguan"></i>¥332
+                &nbsp;
+                <i class="iconfont iconhuangguan"></i>
+                <i class="iconfont iconhuangguan"></i>¥521
+                &nbsp;
+                <i class="iconfont iconhuangguan"></i>
+                <i class="iconfont iconhuangguan"></i>
+                <i class="iconfont iconhuangguan"></i>¥768
+              </div>
+            </el-tooltip>
           </div>
         </el-col>
       </div>
@@ -128,9 +139,8 @@
 export default {
   data() {
     return {
-      isShow: false, //显示隐藏选择人数
+      isShow: false, //显示和隐藏人员显示框
       isShow2: false, //地区显示和隐藏
-      isShow3:false,
       stateCity: "", //城市搜索框
       valueTime: "", //时间区间选择
       inputPeople: "", //人数
@@ -189,18 +199,16 @@ export default {
   // 接收父组件的数据
   props: {
     data: {
-      type: Object,
-      default: {}
+      type: Array,
+      default: []
     }
   },
   methods: {
-    abc(){
-
+    click_P() {
+      this.isShow = !this.isShow;
     },
-    click_P(){
-     this.isShow=!this.isShow
-    },
-    aaaa() {
+    // 区域的多余部分展示和隐藏
+    click_down() {
       this.isShow2 = !this.isShow2;
       if (this.isShow2) {
         this.$refs.show.style.height = "130px";
@@ -208,7 +216,6 @@ export default {
         this.$refs.show.style.height = "40px";
       }
     },
-    // 点击人数未定时触发显示选择框
     // 城市位置发生改变时触发
     changeCity() {
       console.log(111);
@@ -251,14 +258,16 @@ export default {
     },
     // 点击建议栏选中项的时候触发
     handleSelect() {
-      // console.log(this.stateCity);
+      console.log(this.stateCity);
     },
     // 点击触发查看价格
     getPrice() {
       console.log(this.data);
-    }
+    },
+    mapData() {}
   },
-  mounted() {
+  mounted() { 
+    let wanwanList = []
     // 获取城市区域所有列表
     this.$axios({
       url: "cities?name=南京"
@@ -271,19 +280,47 @@ export default {
     // console.log(street);
 
     // 等待下面url加载完毕之后再执行
+    let _this = this;
     window.onLoad = function() {
-      // 创建地图， container是容器的id
-      var map = new AMap.Map("container", {
-        zoom: 11, //级别
-        center: [116.39, 39.9] //中心点坐标
-      });
-      // 创建一个 Marker 实例：
-      var marker = new AMap.Marker({
-        position: new AMap.LngLat(116.39, 39.9), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
-        title: "北京"
-      });
-      // 将创建的点标记添加到已有的地图实例：
-      map.add(marker);
+      // console.log(_this.data);
+
+        // 创建地图， container是容器的id
+        var map = new AMap.Map("container", {
+          zoom: 11, //级别
+          center: [118.82, 32.15] //中心点坐标
+        });
+      // 多个点实例组成的数组
+      for (let i = 0; i < _this.data.length; i++) {
+        var markerList = [];
+        let wanwan = new AMap.Marker({
+          position: new AMap.LngLat(
+            _this.data[i].location.longitude,
+            _this.data[i].location.latitude
+          ), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+          title: "北京"
+        });
+        // console.log(_this.data);
+        // markerList.push(wanwan);
+        console.log(markerList);
+        map.add([wanwan]);
+      }
+      // _this.data.forEach((e, i) => {
+      //   let wanwan = new AMap.Marker({
+      //     position: new AMap.LngLat(e.location.longitudee, e.location.latitude), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+      //     title: "北京"
+      //   });
+      //   markerList.push(wanwan);
+      // });
+      // console.log(markerList);
+      // // 创建一个 Marker 实例：
+      // var marker1 = new AMap.Marker({
+      //   position: new AMap.LngLat(116.39, 39.9), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+      //   title: "北京"
+      // });
+      // var marker2 = new AMap.Marker({
+      //   position: new AMap.LngLat(116.37, 39.85), // 经纬度对象，也可以是经纬度构成的一维数组[116.39, 39.9]
+      //   title: "北京"
+      // });
     };
     var url =
       "https://webapi.amap.com/maps?v=1.4.15&key=18308f708f6d842cfb0043a2c984009e&callback=onLoad";
@@ -357,8 +394,8 @@ export default {
 }
 .number-P {
   height: 120px;
-  width: 300px;
-  background-color: #fff;
+  width: 800px;
+  // background-color: #fff;
   z-index: 12;
   position: absolute;
   left: 593px;
@@ -384,5 +421,22 @@ export default {
 }
 .value1 {
   margin-left: 50px;
+}
+.wenhaoSytle {
+  background: #ccc;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  line-height: 10px;
+  font-size: 10px;
+  padding: 2px;
+  border-radius: 50%;
+  text-align: center;
+  position: absolute;
+  top: 194px;
+  left: 30px;
+  color: #fff;
+  &hover {
+  }
 }
 </style>
