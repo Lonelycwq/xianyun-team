@@ -38,6 +38,7 @@
             v-for="(item,index) in picsArr"
             :key="index"
             @click="changePictureDisplay(index)"
+            :class="{show_outline:displayIndex===index}"
             >
               <a href="javascript:void(0)">
               <img :src="item" :alt="`${detailData.name}`">
@@ -80,12 +81,12 @@
     </div>
     <!-- 酒店位置 -->
     <div class="hotel_location">
-      <div class="map" style="border:1px solid #000;box-sizing: border-box;">
-        高德地图
-      </div>
+      <!-- <div class="map" style="border:1px solid #000;box-sizing: border-box;"> -->
+        <HotelDetailMap></HotelDetailMap>
+      <!-- </div>
       <div class="location_list"  style="border:1px solid #000;box-sizing: border-box;">
         位置列表
-      </div>
+      </div> -->
     </div>
     <!-- 酒店信息 -->
     <div class="hotel_infomation">
@@ -217,7 +218,11 @@
 </template>
 
 <script>
+import HotelDetailMap from '@/components/hotel/hotelDetailMap'
 export default {
+  components:{
+    HotelDetailMap
+  },
   data() {
         return {
           picsArr:[
@@ -280,6 +285,7 @@ export default {
         if(this.detailData.scores.service !== null){
           this.progress.service = this.detailData.scores.service * 10
         }
+        console.log(this.detailData)
     },10)
 
 
@@ -336,6 +342,9 @@ export default {
             &::after{
               content: '';
               clear: both;
+            }
+            .show_outline{
+              outline: 2px #17baec solid;
             }
             ul>li{
               float: left;
@@ -399,26 +408,26 @@ export default {
     }
     .hotel_location{
       height: 360px;
-      .map{
-        float:left;
-        height: 360px;
-        width: 650px;
-        &::after{
-          clear: both;
-          content: '';
-        }
-      }
-      .location_list{
-        float: right;
-        padding: 0 0 0 20px;
-        height: 360px;
-        width:350px;
-        background: #fff;
-          &::after{
-          clear: both;
-          content: '';
-        }
-      }
+      // .map{
+      //   float:left;
+      //   height: 360px;
+      //   width: 650px;
+      //   &::after{
+      //     clear: both;
+      //     content: '';
+      //   }
+      // }
+      // .location_list{
+      //   float: right;
+      //   padding: 0 0 0 20px;
+      //   height: 360px;
+      //   width:350px;
+      //   background: #fff;
+      //     &::after{
+      //     clear: both;
+      //     content: '';
+      //   }
+      // }
     }
     .hotel_infomation{
       margin: 40px 0;

@@ -20,7 +20,7 @@
           <el-row class="level" type="flex">
             <el-dropdown style="width:100%;" @command="handleCommand">
               <div class="el-dropdown-text">
-                <span class="el-dropdown-link col_font">{{levels}}</span>
+                <span class="el-dropdown-link col_font">{{levels || '不限'}}</span>
                 <i class="el-icon-arrow-down el-icon--right" style="align-self: center;"></i>
               </div>
               <el-dropdown-menu slot="dropdown" style="width:150px;">
@@ -101,19 +101,14 @@
     <!-- 酒店列表 -->
     <div class="hotel_list" v-if="dataList.length">
       <div>
-        <div
-          class="hotel_item"
-          v-for="(item,index) in dataList"
-          :key="index"
-          @click="handleHotelData(item)"
-        >
+        <div class="hotel_item" v-for="(item,index) in dataList" :key="index">
           <el-row>
-            <el-col :span="8">
+            <el-col :span="8" @click.native="handleHotelData(item)">
               <nuxt-link to="#">
                 <img class="pic" :src="`${item.photos}`" :alt="`${item.name}`" />
               </nuxt-link>
             </el-col>
-            <el-col :span="10" style="padding-left:15px;">
+            <el-col :span="10" style="padding-left:15px;" @click.native="handleHotelData(item)">
               <h4>
                 <nuxt-link to="#" class="hotel_title">{{item.name}}</nuxt-link>
               </h4>
@@ -157,20 +152,22 @@
             </el-col>
             <!-- 表格 -->
             <el-col :span="6">
-              <el-table :data="item.products" :show-header="false" style="margin-top:20px;">
-                <el-table-column prop="name"></el-table-column>
-                <el-table-column align="right">
-                  <template slot-scope="scope">
-                    <span
-                      data-v-0a769ebc
-                      class="height-light larger"
-                      style="color: #f90;font-size: larger;"
-                    >￥{{scope.row.price}}</span>起
-                    <i data-v-0a769ebc class="el-icon-arrow-right"></i>
-                  </template>
-                </el-table-column>
-                <!-- <el-table-column prop="date"></el-table-column> -->
-              </el-table>
+              <a href="https://hotels.ctrip.com/hotel/694679.html" target="_blank">
+                <el-table :data="item.products" :show-header="false" style="margin-top:20px;">
+                  <el-table-column prop="name"></el-table-column>
+                  <el-table-column align="right">
+                    <template slot-scope="scope">
+                      <span
+                        data-v-0a769ebc
+                        class="height-light larger"
+                        style="color: #f90;font-size: larger;"
+                      >￥{{scope.row.price}}</span>起
+                      <i data-v-0a769ebc class="el-icon-arrow-right"></i>
+                    </template>
+                  </el-table-column>
+                  <!-- <el-table-column prop="date"></el-table-column> -->
+                </el-table>
+              </a>
             </el-col>
           </el-row>
         </div>
@@ -198,9 +195,9 @@ export default {
       hotelOption: {},
       products: [],
       //滑条
-      value2: 0,
+      value2: 4000,
       //多选条件
-      levels: [], // 酒店等级
+      levels: null, // 酒店等级
       types: [], // 酒店类型
       assets: [], // 酒店设施
       brands: [], // 酒店品牌
@@ -222,13 +219,13 @@ export default {
   methods: {
     //选择下拉菜单是触发
     handleCommand(val) {
-      console.log(this.data);
       this.levels = val;
+      console.log(val);
+      console.log(this.$router);
     },
     // 传递数据给酒店详情页
     handleHotelData(data) {
       this.$store.commit("hotel/setHotelData", data);
-      console.log(data);
       const { id, name } = data;
       this.$router.push({
         path: "/hotel/detail",
@@ -248,7 +245,6 @@ export default {
     setIndex() {
       this.total = this.data.length;
       this.dataList = this.data.slice(0, this.pageSize);
-      // console.log(this.dataList)
     }
   },
   mounted() {
@@ -258,10 +254,9 @@ export default {
     }).then(res => {
       this.hotelOption = res.data.data;
       setTimeout(() => {
-      this.setIndex()
-    }, 10);
+        this.setIndex();
+      }, 10);
     });
-    
   }
 };
 </script>
