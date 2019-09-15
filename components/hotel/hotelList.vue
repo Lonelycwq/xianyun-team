@@ -101,19 +101,14 @@
     <!-- 酒店列表 -->
     <div class="hotel_list" v-if="dataList.length">
       <div>
-        <div
-          class="hotel_item"
-          v-for="(item,index) in dataList"
-          :key="index"
-          @click="handleHotelData(item)"
-        >
+        <div class="hotel_item" v-for="(item,index) in dataList" :key="index">
           <el-row>
-            <el-col :span="8">
+            <el-col :span="8" @click.native="handleHotelData(item)">
               <nuxt-link to="#">
                 <img class="pic" :src="`${item.photos}`" :alt="`${item.name}`" />
               </nuxt-link>
             </el-col>
-            <el-col :span="10" style="padding-left:15px;">
+            <el-col :span="10" style="padding-left:15px;" @click.native="handleHotelData(item)">
               <h4>
                 <nuxt-link to="#" class="hotel_title">{{item.name}}</nuxt-link>
               </h4>
@@ -157,20 +152,22 @@
             </el-col>
             <!-- 表格 -->
             <el-col :span="6">
-              <el-table :data="item.products" :show-header="false" style="margin-top:20px;">
-                <el-table-column prop="name"></el-table-column>
-                <el-table-column align="right">
-                  <template slot-scope="scope">
-                    <span
-                      data-v-0a769ebc
-                      class="height-light larger"
-                      style="color: #f90;font-size: larger;"
-                    >￥{{scope.row.price}}</span>起
-                    <i data-v-0a769ebc class="el-icon-arrow-right"></i>
-                  </template>
-                </el-table-column>
-                <!-- <el-table-column prop="date"></el-table-column> -->
-              </el-table>
+              <a href="https://hotels.ctrip.com/hotel/694679.html" target="_blank">
+                <el-table :data="item.products" :show-header="false" style="margin-top:20px;">
+                  <el-table-column prop="name"></el-table-column>
+                  <el-table-column align="right">
+                    <template slot-scope="scope">
+                      <span
+                        data-v-0a769ebc
+                        class="height-light larger"
+                        style="color: #f90;font-size: larger;"
+                      >￥{{scope.row.price}}</span>起
+                      <i data-v-0a769ebc class="el-icon-arrow-right"></i>
+                    </template>
+                  </el-table-column>
+                  <!-- <el-table-column prop="date"></el-table-column> -->
+                </el-table>
+              </a>
             </el-col>
           </el-row>
         </div>
@@ -198,7 +195,7 @@ export default {
       hotelOption: {},
       products: [],
       //滑条
-      value2: 0,
+      value2: 4000,
       //多选条件
       levels: null, // 酒店等级
       types: [], // 酒店类型
@@ -223,8 +220,8 @@ export default {
     //选择下拉菜单是触发
     handleCommand(val) {
       this.levels = val;
-      console.log(val)
-      console.log(this.$route)
+      console.log(val);
+      console.log(this.$router);
     },
     // 传递数据给酒店详情页
     handleHotelData(data) {
