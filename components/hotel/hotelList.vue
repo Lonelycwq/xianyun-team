@@ -189,7 +189,7 @@ export default {
     // 传递数据给酒店详情页
     handleHotelData(data){
       this.$store.commit('hotel/setHotelData',data)
-      console.log(data)
+      // console.log(data)
       const { id,name } = data
       this.$router.push({
         path:'/hotel/detail',

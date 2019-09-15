@@ -40,11 +40,14 @@
               </el-col>
             </el-row>
           </div>
+              <!-- 新增评论 -->
+        <AddNewComment></AddNewComment>
           <Comment @getTotal="getTotal"></Comment>
         </div>
       </div>
       <DetailAside :data="recommendList" class="aside" />
     </el-row>
+
   </div>
 </template>
 
@@ -53,9 +56,10 @@
 import moment from 'moment'
 import DetailAside from '@/components/post/detailAside'
 import Comment from '@/components/post/comment'
+import AddNewComment from '@/components/post/addNewComment'
 export default {
   components: {
-    DetailAside,Comment
+    DetailAside,Comment,AddNewComment
   },
   filters: {
     // 时间过滤

@@ -1,6 +1,5 @@
 <template>
   <div class="comment-main">
-
     <div class="comment-list">
       <CommentList :data="commentList"></CommentList>
     </div>
