@@ -58,9 +58,10 @@
       <el-row class="size_row"
       v-for="(item,index) in sizeData"
       :key="index"
+      @click.native="jump(item)"
       >
         <el-col :span="10" class="info_col">
-          <nuxt-link class="href_jump" to="#"><p>{{item.name}}</p>
+          <nuxt-link class="href_jump" to=""><p>{{item.name}}</p>
           </nuxt-link>
         </el-col>
         <el-col :span="10" class="info_col">
@@ -267,6 +268,15 @@ export default {
         this.picsArr.unshift(this.detailData.photos)
         // 处理酒店规格的数据
         this.sizeData = this.detailData.products
+        this.sizeData.forEach(e => {
+          if(e.name === '艺龙'){
+            e.url = 'http://www.elong.com/'
+          } else if(e.name === 'Hotels.com'){
+            e.url = 'https://www.hotels.cn/'
+          } else {
+            e.url = 'https://hotels.ctrip.com/'
+          }
+        })
         // 处理酒店的主要设施的数据
         this.hotelassets = this.detailData.hotelassets
         // 处理酒店的品牌信息
@@ -285,7 +295,7 @@ export default {
         if(this.detailData.scores.service !== null){
           this.progress.service = this.detailData.scores.service * 10
         }
-        console.log(this.detailData)
+        // console.log(this.detailData)
     },10)
 
 
@@ -294,6 +304,10 @@ export default {
     // 处理更换显示展示图
     changePictureDisplay(index){
       this.displayIndex = index
+    },
+    // 处理酒店表格数据跳转
+    jump(item){
+      window.open(item.url)
     }
   }
 }
