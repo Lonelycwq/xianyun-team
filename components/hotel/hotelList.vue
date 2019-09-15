@@ -18,7 +18,7 @@
             <el-col :span="24" class="col_font">住宿等级</el-col>
           </el-row>
           <el-row class="level" type="flex">
-            <el-dropdown style="width:100%;" @command="handleCommand">
+            <el-dropdown style="width:100%;" @command="handleLevel">
               <div class="el-dropdown-text">
                 <span class="el-dropdown-link col_font">{{levels || '不限'}}</span>
                 <i class="el-icon-arrow-down el-icon--right" style="align-self: center;"></i>
@@ -38,16 +38,17 @@
           <el-row type="flex">
             <el-col :span="24" class="col_font">住宿类型</el-col>
           </el-row>
-          <el-row class="level" type="flex">
-            <el-dropdown style="width:100%;">
+          <el-row class="types" type="flex">
+            <el-dropdown style="width:100%;" @command="handleTypes">
               <div class="el-dropdown-text">
-                <span class="el-dropdown-link col_font">不限</span>
+                <span class="el-dropdown-link col_font">{{types || '不限'}}</span>
                 <i class="el-icon-arrow-down el-icon--right" style="align-self: center;"></i>
               </div>
               <el-dropdown-menu slot="dropdown" style="width:150px;">
                 <el-dropdown-item
                   v-for="(item,index) in hotelOption.types"
                   :key="index"
+                  :command="item.name"
                 >{{item.name}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -58,16 +59,17 @@
           <el-row type="flex">
             <el-col :span="24" class="col_font">酒店设施</el-col>
           </el-row>
-          <el-row class="level" type="flex">
-            <el-dropdown style="width:100%;">
+          <el-row class="assets" type="flex">
+            <el-dropdown style="width:100%;" @command="handleAssets">
               <div class="el-dropdown-text">
-                <span class="el-dropdown-link col_font">不限</span>
+                <span class="el-dropdown-link col_font">{{assets || '不限'}}</span>
                 <i class="el-icon-arrow-down el-icon--right" style="align-self: center;"></i>
               </div>
               <el-dropdown-menu slot="dropdown" style="width:150px;">
                 <el-dropdown-item
                   v-for="(item,index) in hotelOption.assets"
                   :key="index"
+                  :command="item.name"
                 >{{item.name}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -78,10 +80,10 @@
           <el-row type="flex">
             <el-col :span="24" class="col_font">酒店品牌</el-col>
           </el-row>
-          <el-row class="level" type="flex">
-            <el-dropdown style="width:100%;">
+          <el-row class="brands" type="flex">
+            <el-dropdown style="width:100%;" @command="handleBrands">
               <div class="el-dropdown-text">
-                <span class="el-dropdown-link col_font">不限</span>
+                <span class="el-dropdown-link col_font">{{brands || '不限'}}</span>
                 <i class="el-icon-arrow-down el-icon--right" style="align-self: center;"></i>
               </div>
               <el-dropdown-menu
@@ -91,6 +93,7 @@
                 <el-dropdown-item
                   v-for="(item,index) in hotelOption.brands"
                   :key="index"
+                  :command="item.name"
                 >{{item.name}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -173,6 +176,7 @@
         </div>
       </div>
     </div>
+    <div v-else>没有找到相应的酒店</div>
     <!-- 分页 -->
     <el-pagination
       small
@@ -198,16 +202,17 @@ export default {
       value2: 4000,
       //多选条件
       levels: null, // 酒店等级
-      types: [], // 酒店类型
-      assets: [], // 酒店设施
-      brands: [], // 酒店品牌
+      types: null, // 酒店类型
+      assets: null, // 酒店设施
+      brands: null, // 酒店品牌
       // //星级
       // value: 3.5
       //分页
       total: 0,
       pageSize: 5,
       pageIndex: 1,
-      dataList: []
+      dataList: [],
+      fliterList:[]
     };
   },
   props: {
@@ -216,12 +221,50 @@ export default {
       default: 0
     }
   },
+  watch: {
+    $route(to, from) {
+      console.log(this.$route);
+      this.$axios({
+        url: "/hotels",
+        params: this.$route.query
+      }).then(res => {
+        console.log(res);
+        this.fliterList = {...this.dataList}
+        this.dataList = res.data.data
+      });
+    }
+  },
   methods: {
-    //选择下拉菜单是触发
-    handleCommand(val) {
+    //选择下拉菜单是触发：酒店等级
+    handleLevel(val) {
       this.levels = val;
-      console.log(val);
-      console.log(this.$router);
+      let url = this.$route.fullPath;
+      if (Object.keys(this.$route.query).indexOf("hotellevel") == -1) {
+        // console.log(111);
+        url = `${url}&hotellevel=${parseInt(val)}&price_lt=${this.value2}`;
+        this.$router.push(url);
+      } else {
+        let query = this.$router.history.current.query;
+        let path = this.$router.history.current.path;
+        console.log(query, path);
+        this.$router.push({ path, query: {
+          city:74,
+          hotellevel:parseInt(val),
+          price_lt:this.value2
+        } });
+      }
+    },
+    //酒店类型
+    handleTypes(val) {
+      this.types = val;
+    },
+    //酒店设施
+    handleAssets(val) {
+      this.assets = val;
+    },
+    //酒店品牌
+    handleBrands(val) {
+      this.brands = val;
     },
     // 传递数据给酒店详情页
     handleHotelData(data) {
@@ -253,6 +296,7 @@ export default {
       url: "/hotels/options"
     }).then(res => {
       this.hotelOption = res.data.data;
+      // console.log(this.hotelOption);
       setTimeout(() => {
         this.setIndex();
       }, 10);
@@ -282,7 +326,10 @@ export default {
           color: #666;
           font-size: 14px;
         }
-        .level {
+        .level,
+        .types,
+        .brands,
+        .assets {
           height: 38px;
           align-items: center;
           .el-dropdown-text {
