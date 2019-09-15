@@ -45,6 +45,7 @@
       </div>
       <DetailAside :data="recommendList" class="aside" />
     </el-row>
+
   </div>
 </template>
 
