@@ -40,11 +40,14 @@
               </el-col>
             </el-row>
           </div>
+              <!-- 新增评论 -->
+        <AddNewComment></AddNewComment>
           <Comment @getTotal="getTotal"></Comment>
         </div>
       </div>
       <DetailAside :data="recommendList" class="aside" />
     </el-row>
+
   </div>
 </template>
 
@@ -53,9 +56,10 @@
 import moment from 'moment'
 import DetailAside from '@/components/post/detailAside'
 import Comment from '@/components/post/comment'
+import AddNewComment from '@/components/post/addNewComment'
 export default {
   components: {
-    DetailAside,Comment
+    DetailAside,Comment,AddNewComment
   },
   filters: {
     // 时间过滤
@@ -70,18 +74,48 @@ export default {
       postInfo: {},
       // 评论列表
       recommendList: [],
-      // 文章id
-      postId: this.$route.query.id,
       // 评论总数
       total: 0
     }
   },
+  watch:{
+    // 监听路由中文章的id变化更新数据
+    $route(){
+      this.init()
+      this.cmd()
+    }
+  },
   methods:{
+    // 获取文章详情的请求
+    init(){
+      // 根据文章id发送请求
+      this.$axios({
+        url: '/posts',
+        params: { id: this.$route.query.id }
+      })
+      .then((res) => {
+        // console.log(res)
+        // 文章数据赋值
+        this.postInfo = res.data.data[0]
+      })
+    },
+    // 根据id推荐文章列表
+    cmd(){
+      this.$axios({
+        url: '/posts/recommend',
+        params: { id: this.$route.query.id }
+      })
+      .then((res) => {
+        // console.log(res)
+        // 推荐文章列表赋值
+        this.recommendList = res.data.data
+      })
+    },
     // 文章点赞方法
     setLike(){
       this.$axios({
         url: '/posts/like',
-        params: {id: this.postId},
+        params: {id: this.$route.query.id},
         // 给接口单独加上请求头
         headers: {
           Authorization: `Bearer ${this.$store.state.user.userInfo.token}`
@@ -91,15 +125,14 @@ export default {
         // console.log(res)
         this.$message.success('点赞成功')
       })
-      .catch((err)=>{
-        console.log(err)
-      })
+      //重新加载数据
+      this.init()
     },
     // 文章收藏方法
     setStar(){
       this.$axios({
         url: '/posts/star',
-        params: {id: this.postId},
+        params: {id: this.$route.query.id},
         // 给接口单独加上请求头
         headers: {
           Authorization: `Bearer ${this.$store.state.user.userInfo.token}`
@@ -109,9 +142,6 @@ export default {
         // console.log(res)
         this.$message.success('收藏成功')
       })
-      .catch((err)=>{
-        console.log(err)
-      })
     },
     // 接收子组件传递的评论总数
     getTotal(val){
@@ -119,32 +149,8 @@ export default {
     }
   },
   mounted () {
-    // 根据文章id发送请求
-    this.$axios({
-      url: '/posts',
-      params: { id: this.postId }
-    })
-      .then((res) => {
-        // console.log(res)
-        // 文章数据赋值
-        this.postInfo = res.data.data[0]
-      })
-      .catch((err) => {
-        console.log(err)
-      })
-      // 根据id推荐文章列表
-    this.$axios({
-      url: '/posts/recommend',
-      params: { id: this.postId }
-    })
-      .then((res) => {
-        // console.log(res)
-        // 推荐文章列表赋值
-        this.recommendList = res.data.data
-      })
-      .catch((err) => {
-        console.log(err)
-      })
+    this.init()
+    this.cmd()
   }
 }
 </script>
