@@ -14,6 +14,8 @@
       <div id="richText">
         <VueEditor :config="config" ref="vueEditor" />
       </div>
+      <!-- id隐藏域 -->
+      <input type="hidden" v-model="addPostInfo.draftId" />
       <!-- 城市选择 -->
       <el-form-item label="选择城市">
         <!-- fetch-suggestions: 获取搜索建议，并且显示在输入框的下拉框中 -->
@@ -47,6 +49,12 @@ if (process.browser) {
   VueEditor = require("vue-word-editor").default;
 }
 export default {
+  props:{
+    item:{
+      type:Object,
+      default:{}
+    }
+  },
   name: "richText",
   data() {
     return {
@@ -99,12 +107,14 @@ export default {
       addPostInfo: {
         title: "", // 文章标题
         content: "", // 文章内容
-        city: null // 城市名称
+        city: null, // 城市名称
+        draftId:1// form表单对象id
       },
       // (城市名称)的城市id
       cityName: "",
       // 城市下拉数组
-      cityList: []
+      cityList: [],
+      time:''
     };
   },
   // 注册富文本框组件
@@ -155,7 +165,7 @@ export default {
     },
     // 城市输入框失去焦点时候触发
     handleCityBlur() {
-      this.addPostInfo.city = this.cityList[0] ? this.cityList[0].value : "";
+      this.cityName = this.cityList[0] ? this.cityList[0].value : "";
     },
     // 点击发布事件
     addPost() {
@@ -196,46 +206,81 @@ export default {
     },
     // 点击保存草稿事件
     draftPost() {
-        this.addPostInfo.content = this.$refs.vueEditor.editor.root.innerHTML;
-        // 时间处理
-        let time = new Date();
-        // 转换时间格式
-        time =
-          time.getFullYear() +
-          "-" +
-          (time.getMonth() + 1) +
-          "-" +
-          time.getDate();
-        // console.log(this.draftTime);
-        // 把时间和表单数据合并添加到一个新的对象里
-        const newAddPostInfo = {
+      // 判断非空
+      if (!this.addPostInfo.title) {
+        this.$message.error("标题不能为空哦！");
+        return;
+      }
+      if (!this.$refs.vueEditor.editor.root.innerHTML) {
+        this.$message.error("内容不能为空哦！");
+        return;
+      }
+      if (!this.cityName) {
+        this.$message.error("城市不能为空哦！");
+        return;
+      }
+      // 获取store里面的草稿文章数据数组 => 修改store里面每个对象的id，让其自增
+      const arrDraft = [...this.$store.state.post.draftPost]
+      // console.log(arrDraft);
+      if(arrDraft.length !== 0){
+        let lastObj = arrDraft.slice(arrDraft.length-1)
+         // 设置当前草稿id
+        this.addPostInfo.draftId = lastObj[0].draftId +1
+      }
+      // 时间处理
+      this.time = new Date();
+      // 转换时间格式
+      this.time = this.time.getFullYear() + "-" + (this.time.getMonth() + 1) + "-" + this.time.getDate();
+      this.addPostInfo.content = this.$refs.vueEditor.editor.root.innerHTML;
+      // 把时间和表单数据合并添加到一个新的对象里
+      const newAddPostInfo = {
+        ...this.addPostInfo,
+        draftTime: this.time,
+        cityName:this.cityName
+        // 根据当前时间生成唯一的id
+        // draftId: Date.now()
+      };
+      // 把值存到store
+      this.$store.commit("post/setDraftPost", newAddPostInfo);
+      // 把表单清空=>重置表单
+      this.addPostInfo.title = "";
+      this.$refs.vueEditor.editor.root.innerHTML = "";
+      this.cityName = "";
+      this.addPostInfo.city = null;
+      this.addPostInfo.content = "";
+      // 遍历数组
+      arrDraft.forEach((e,i)=>{
+        if(e.draftId === this.item.draftId){
+        let newDraft = arrDraft.splice(i,1,{
           ...this.addPostInfo,
-          draftTime: time,
-          // 根据当前时间生成唯一的id
-          draftId: Date.now()
-        };
-        // 把表单清空=>重置表单
-        this.addPostInfo.title = "";
-        this.$refs.vueEditor.editor.root.innerHTML = "";
-        this.cityName = "";
-        this.addPostInfo.city = null;
-        this.addPostInfo.content = "";
-        // console.log(newAddPostInfo);
-        // 把值存到store
-        this.$store.commit("post/setDraftPost", newAddPostInfo);
-        return newAddPostInfo;
+          draftTime:this.time,
+          cityName:this.cityName
+        })
+        // 调用store里的方法
+        this.$store.commit('post/setNowDraft',newDraft)
+        }
+      })
     }
   },
+  mounted(){
+    // 把表单清空=>重置表单
+    this.addPostInfo.title = "";
+    this.$refs.vueEditor.editor.root.innerHTML = "";
+    this.cityName = "";
+    this.addPostInfo.city = null;
+    this.addPostInfo.content = "";
+  },
   watch: {
-    "$store.state.post.nowDraft"() {
-      const newObj = this.$store.state.post.nowDraft;
+    "item"() {
+      const newObj = this.item;
       // 赋值
+      this.addPostInfo.draftId = newObj.draftId;
       this.addPostInfo.title = newObj.title;
       this.$refs.vueEditor.editor.root.innerHTML = newObj.content;
-      this.cityName = newObj.city;
+      this.cityName = newObj.cityName;
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>
