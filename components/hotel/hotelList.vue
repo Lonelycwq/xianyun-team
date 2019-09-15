@@ -20,7 +20,7 @@
           <el-row class="level" type="flex">
             <el-dropdown style="width:100%;" @command="handleCommand">
               <div class="el-dropdown-text">
-                <span class="el-dropdown-link col_font">{{levels}}</span>
+                <span class="el-dropdown-link col_font">{{levels || '不限'}}</span>
                 <i class="el-icon-arrow-down el-icon--right" style="align-self: center;"></i>
               </div>
               <el-dropdown-menu slot="dropdown" style="width:150px;">
@@ -200,7 +200,7 @@ export default {
       //滑条
       value2: 0,
       //多选条件
-      levels: [], // 酒店等级
+      levels: null, // 酒店等级
       types: [], // 酒店类型
       assets: [], // 酒店设施
       brands: [], // 酒店品牌
@@ -222,13 +222,13 @@ export default {
   methods: {
     //选择下拉菜单是触发
     handleCommand(val) {
-      console.log(this.data);
       this.levels = val;
+      console.log(val)
+      console.log(this.$route)
     },
     // 传递数据给酒店详情页
     handleHotelData(data) {
       this.$store.commit("hotel/setHotelData", data);
-      console.log(data);
       const { id, name } = data;
       this.$router.push({
         path: "/hotel/detail",
@@ -248,7 +248,6 @@ export default {
     setIndex() {
       this.total = this.data.length;
       this.dataList = this.data.slice(0, this.pageSize);
-      // console.log(this.dataList)
     }
   },
   mounted() {
@@ -258,10 +257,9 @@ export default {
     }).then(res => {
       this.hotelOption = res.data.data;
       setTimeout(() => {
-      this.setIndex()
-    }, 10);
+        this.setIndex();
+      }, 10);
     });
-    
   }
 };
 </script>
