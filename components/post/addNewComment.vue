@@ -1,6 +1,14 @@
 <template>
   <div class="container">
     <h4>评论</h4>
+    <div v-if="followShow" style="margin-bottom:10px;">
+      <el-tag 
+      closable
+      type="info"
+      @close="closecom">
+      回复@{{ follow.account.nickname }}
+      </el-tag>
+    </div>
     <input type="text" placeholder="说点什么吧..." v-model="addCommentObj.content" >
     <div class="commit">
       <div class="upload">
@@ -16,8 +24,8 @@
           <i class="el-icon-plus"></i>
         </el-upload>
         <el-dialog :visible.sync="dialogVisible" size="tiny">
-        <img width="100%" :src="dialogImageUrl" alt="">
-      </el-dialog>
+          <img width="100%" :src="dialogImageUrl" alt="">
+        </el-dialog>
       </div>
       <div class="submit_button" @click="submitComment">提交</div>
     </div>
@@ -34,14 +42,26 @@ export default {
   },
   data(){
     return {
+      // 新增评论的参数对象
       addCommentObj:{
         content:'',
         pics:[],
-        post:this.$route.query.id,       //攻略id
-        follow: ''
+        post:this.$route.query.id      //攻略id
       },
+      // 预览图片的路径
       dialogImageUrl: '',
-      dialogVisible: false
+      // 预览框显示
+      dialogVisible: false,
+      // 回复标签显示
+      followShow: false
+    }
+  },
+  watch:{
+    'follow'(newval,oldval){
+      if (newval.id) {
+        this.followShow = true
+        this.addCommentObj.follow = newval.id
+      }
     }
   },
   methods:{
@@ -92,7 +112,12 @@ export default {
           this.$message.error('图片上传失败')
         }
     },
+    // 提交新增请求
     submitComment(){
+      if (!this.addCommentObj.content) {
+        this.$message.error('评论不可为空')
+        return false
+      }
       this.$axios({
         url: "/comments",
         method: 'post',
@@ -104,14 +129,25 @@ export default {
       })
       .then( res=>{
         // console.log(res)
+        // 清空表单
         if(res.status === 200 ){
           this.$message.success('新增成功！')
-          this.addCommentObj.comment = '',
+          this.followShow = false
+          this.addCommentObj.content = '',
           this.addCommentObj.follow = '',
           this.addCommentObj.pics = []
           this.$emit('updInit','')
+          this.$store.commit('post/setFollowObj',{})
         }
       })
+    },
+    // 取消回复评论
+    closecom(){
+      this.followShow = false
+      this.addCommentObj.content = '',
+      this.addCommentObj.follow = '',
+      this.addCommentObj.pics = []
+      this.$store.commit('post/setFollowObj',{})
     }
   }
 }

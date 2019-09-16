@@ -12,7 +12,7 @@
         </div>
         <div class="comment-content">
           <div class="user-floor">
-          <CommentList :data="item" v-if="item.parent"></CommentList>
+          <CommentList :data="item.parent" v-if="item.parent"></CommentList>
           </div>
           <div class="user-self">{{ item.content }}</div>
           <el-row type="flex" :gutter="15">
@@ -75,6 +75,16 @@ export default {
       return filtersTime
     }
   },
+  watch:{
+    '$store.state.post.followObj'(newval,oldnew){
+      this.followObj = newval
+    },
+    // 监听路由中文章的id变化更新数据
+    $route(){
+      this.getCommentObj.post = this.$route.query.id
+      this.init()
+    }
+  },
   methods:{
     updInit(){
       this.init()
@@ -86,7 +96,7 @@ export default {
         params: this.getCommentObj
       })
       .then((res)=>{
-        console.log(res)
+        // console.log(res)
         this.commentList = res.data.data
         this.$emit('getTotal',res.data.total)
         this.total = res.data.total
@@ -120,6 +130,10 @@ export default {
     //回复获取参数
     replyById(item){
       this.followObj = item
+    },
+    //评论组件发送回复评论id
+    getId(obj){
+      this.followObj = obj
     }
   },
   mounted(){
