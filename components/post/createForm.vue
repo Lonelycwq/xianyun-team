@@ -15,7 +15,7 @@
         <VueEditor :config="config" ref="vueEditor" />
       </div>
       <!-- id隐藏域 -->
-      <input type="hidden" v-model="addPostInfo.draftId" />
+      <input type="hidden" v-model="draftId" />
       <!-- 城市选择 -->
       <el-form-item label="选择城市">
         <!-- fetch-suggestions: 获取搜索建议，并且显示在输入框的下拉框中 -->
@@ -49,10 +49,10 @@ if (process.browser) {
   VueEditor = require("vue-word-editor").default;
 }
 export default {
-  props:{
-    item:{
-      type:Object,
-      default:{}
+  props: {
+    item: {
+      type: Object,
+      default: {}
     }
   },
   name: "richText",
@@ -108,13 +108,13 @@ export default {
         title: "", // 文章标题
         content: "", // 文章内容
         city: null, // 城市名称
-        draftId:1// form表单对象id
       },
+      draftId: 1,// form表单对象id
       // (城市名称)的城市id
       cityName: "",
       // 城市下拉数组
       cityList: [],
-      time:''
+      time: ""
     };
   },
   // 注册富文本框组件
@@ -193,6 +193,7 @@ export default {
         },
         data: this.addPostInfo
       }).then(res => {
+        console.log(res);
         // 保存新增文章数据(重新赋值)
         this.addPostInfo = res.data;
         // 提示用户
@@ -206,6 +207,8 @@ export default {
     },
     // 点击保存草稿事件
     draftPost() {
+      // 富文本框对应的数据
+      this.addPostInfo.content = this.$refs.vueEditor.editor.root.innerHTML;
       // 判断非空
       if (!this.addPostInfo.title) {
         this.$message.error("标题不能为空哦！");
@@ -219,50 +222,84 @@ export default {
         this.$message.error("城市不能为空哦！");
         return;
       }
-      // 获取store里面的草稿文章数据数组 => 修改store里面每个对象的id，让其自增
-      const arrDraft = [...this.$store.state.post.draftPost]
-      // console.log(arrDraft);
-      if(arrDraft.length !== 0){
-        let lastObj = arrDraft.slice(arrDraft.length-1)
-         // 设置当前草稿id
-        this.addPostInfo.draftId = lastObj[0].draftId +1
+      // 判断是否有id
+      if (!this.item.id) {
+        // 获取store里面的草稿文章数据数组 => 修改store里面每个对象的id，让其自增
+        const arrDraft = [...this.$store.state.post.draftPost];
+        // console.log(arrDraft);
+        if (arrDraft.length !== 0) {
+          let lastObj = arrDraft.slice(arrDraft.length - 1);
+          // 设置当前草稿id
+          this.draftId = lastObj[0].id + 1;
+        }
+        // 时间处理
+        this.time = new Date();
+        // 转换时间格式
+        this.time =
+          this.time.getFullYear() +
+          "-" +
+          (this.time.getMonth() + 1) +
+          "-" +
+          this.time.getDate();
+        let newObj = {
+          ...this.addPostInfo,
+          draftTime: this.time,
+          cityName: this.cityName,
+          id:this.draftId
+        };
+        // 重新保存数据到store
+        this.$store.commit("post/setDraftPost", newObj); 
+      } else {
+        // 判断是否是草稿数据
+        if (
+          this.addPostInfo.title !== this.item.title &&
+          this.addPostInfo.content !== this.item.content &&
+          this.$refs.vueEditor.editor.root.innerHTML !== this.item.content &&
+          this.cityName !== this.item.cityName
+        ) {
+          return;
+        }
+        // 调用store里面的数据
+        let DraftArr = [...this.$store.state.post.draftPost] || [];
+        // 遍历找出对应的index
+        let index = DraftArr.findIndex(v => {
+          return v.id = this.item.id;
+        });
+        // 更新数据
+        // let lastObj = DraftArr.slice(DraftArr.length - 1);
+        // 设置当前草稿id
+        // this.addPostInfo.draftId = lastObj[0].draftId + 1;
+        // 修改富文本框
+        this.addPostInfo.content = this.$refs.vueEditor.editor.root.innerHTML;
+        // 时间处理
+        this.time = new Date();
+        // 转换时间格式
+        this.time =
+          this.time.getFullYear() +
+          "-" +
+          (this.time.getMonth() + 1) +
+          "-" +
+          this.time.getDate();
+        let newObjInfo = {
+          ...this.addPostInfo,
+          draftTime: this.time,
+          cityName: this.cityName,
+          id:this.draftId
+        };
+        // 替换
+        DraftArr.splice(index, 1, newObjInfo);
+        // 重新保存数据到store
+        this.$store.commit("post/setNowDraft", DraftArr);
       }
-      // 时间处理
-      this.time = new Date();
-      // 转换时间格式
-      this.time = this.time.getFullYear() + "-" + (this.time.getMonth() + 1) + "-" + this.time.getDate();
-      this.addPostInfo.content = this.$refs.vueEditor.editor.root.innerHTML;
-      // 把时间和表单数据合并添加到一个新的对象里
-      const newAddPostInfo = {
-        ...this.addPostInfo,
-        draftTime: this.time,
-        cityName:this.cityName
-        // 根据当前时间生成唯一的id
-        // draftId: Date.now()
-      };
-      // 把值存到store
-      this.$store.commit("post/setDraftPost", newAddPostInfo);
       // 把表单清空=>重置表单
       this.addPostInfo.title = "";
       this.$refs.vueEditor.editor.root.innerHTML = "";
       this.cityName = "";
       this.addPostInfo.city = null;
       this.addPostInfo.content = "";
-      // 遍历数组
-      /* arrDraft.forEach((e,i)=>{
-        if(e.draftId === this.item.draftId){
-        let newDraft = arrDraft.splice(i,1,{
-          ...this.addPostInfo,
-          draftTime:this.time,
-          cityName:this.cityName
-        })
-        // 调用store里的方法
-        this.$store.commit('post/setNowDraft',newDraft)
-        }
-      }) */
     }
   },
-  mounted(){
+  mounted() {
     // 把表单清空=>重置表单
     this.addPostInfo.title = "";
     this.$refs.vueEditor.editor.root.innerHTML = "";
@@ -271,16 +308,16 @@ export default {
     this.addPostInfo.content = "";
   },
   watch: {
-    "item"() {
+    item() {
       const newObj = this.item;
       // 赋值
-      this.addPostInfo.draftId = newObj.draftId;
+      this.draftId = newObj.draftId;
       this.addPostInfo.title = newObj.title;
       this.$refs.vueEditor.editor.root.innerHTML = newObj.content;
       this.cityName = newObj.cityName;
     }
   }
-}
+};
 </script>
 
 <style lang="less" scoped>

@@ -18,7 +18,7 @@ export const mutations = {
     DraftPost(state, draft){
         state.draftPost = draft;
     }, 
-    // 修改当前草稿
+    // 修改草稿
     setNowDraft(state,Draft){
         state.draftPost = Draft;
     }

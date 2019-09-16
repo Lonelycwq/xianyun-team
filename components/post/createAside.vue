@@ -41,7 +41,7 @@ export default {
   },
   mounted () {
     // 从store获取草稿数据
-    const arr = this.$store.state.post.draftPost
+    const arr = [...this.$store.state.post.draftPost]
     // 赋值
     this.draftArr = arr
     // console.log(this.draftArr);
