@@ -82,12 +82,8 @@
     </div>
     <!-- 酒店位置 -->
     <div class="hotel_location">
-      <!-- <div class="map" style="border:1px solid #000;box-sizing: border-box;"> -->
+      <!-- 添加地图组件模块 -->
         <HotelDetailMap></HotelDetailMap>
-      <!-- </div>
-      <div class="location_list"  style="border:1px solid #000;box-sizing: border-box;">
-        位置列表
-      </div> -->
     </div>
     <!-- 酒店信息 -->
     <div class="hotel_infomation">
@@ -226,6 +222,7 @@ export default {
   },
   data() {
         return {
+          // 构建一个缩略图数组
           picsArr:[
             "http://157.122.54.189:9093/images/hotel-pics/2.jpeg",
             "http://157.122.54.189:9093/images/hotel-pics/3.jpeg",
@@ -236,6 +233,7 @@ export default {
           displayIndex:0,
           sizeData: [],
           starScore:0,
+          // 存储整个酒店信息的大对象
           detailData:{},
           breadcrumbArr:[],
           level:[],
@@ -253,20 +251,20 @@ export default {
   mounted(){
     // 使用定时器添加个队列，确保获取数据之后再渲染页面
     setTimeout(async ()=>{
-        // 从store里面获取数据
+        // 01.从store里面获取数据
         this.detailData = this.$store.state.hotel.hotelData
-        // 处理面包屑导航数据
+        // 02.处理面包屑导航数据
         var arr = await this.detailData.breadcrumb.split(' > ')
         this.breadcrumbArr.push(arr[0],arr[arr.length-1])
-        // 处理酒店星级皇冠图标的数据
+        // 03.处理酒店星级皇冠图标的数据
         if(this.detailData.hotellevel !== null ){
           this.level.length = this.detailData.hotellevel.level
         } else {
           this.level.length = []
         }
-        // 处理展示图片的数据
+        // 04.处理展示图片的数据------确保缩略图第一个显示的与大图一致
         this.picsArr.unshift(this.detailData.photos)
-        // 处理酒店规格的数据
+        // 05.处理酒店规格的数据，添加一个 url属性 便于后续点击后跳转
         this.sizeData = this.detailData.products
         this.sizeData.forEach(e => {
           if(e.name === '艺龙'){
@@ -277,15 +275,15 @@ export default {
             e.url = 'https://hotels.ctrip.com/'
           }
         })
-        // 处理酒店的主要设施的数据
+        // 06.处理酒店的主要设施的数据
         this.hotelassets = this.detailData.hotelassets
-        // 处理酒店的品牌信息
+        // 07.处理酒店的品牌信息------值为null，则采用 本地的data中数据
         if(this.detailData.hotelbrand !== null ){
           this.hotelbrand = this.detailData.hotelbrand
         }
-        // 处理星星评分的数据
+        // 08.处理星星评分的数据
         this.starScore = this.detailData.stars
-        // 处理环境、产品、服务评分的数据
+        // 09.处理环境、产品、服务评分的数据------因为环形进度条已 值% 为单位，显示时先扩大，使用时再缩小
         if(this.detailData.scores.environment !== null){
           this.progress.environment = this.detailData.scores.environment * 10
         }
@@ -301,12 +299,13 @@ export default {
 
   },
   methods:{
-    // 处理更换显示展示图
+    // 01.处理更换显示大的展示图
     changePictureDisplay(index){
       this.displayIndex = index
     },
-    // 处理酒店表格数据跳转
+    // 02.处理点击酒店表格数据的跳转
     jump(item){
+      // window.open()方法会新开一个页面显示
       window.open(item.url)
     }
   }

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="comment-detail">
+    <div class="comment-detail" v-if="data">
       <div class="user-floor">
         <CommentList :data="data.parent" v-if="data.parent"></CommentList>
       </div>
@@ -20,7 +20,7 @@
           </div>
         </el-row>
         <div class="comment-ctrl" @mousemove="reply=true" @mouseout="reply=false">
-          <a v-show="reply" href="javascript:;">回复</a>
+          <a v-show="reply" href="javascript:;" @click="replyById(data)">回复</a>
         </div>
       </div>
     </div>
@@ -56,10 +56,12 @@ export default {
   methods:{
     showPic(){
       this.dialogPic = true
+    },
+    replyById(data){
+      this.$store.commit('post/setFollowObj',data)
     }
   },
   mounted(){
-    console.log(this.data)
   }
 }
 </script>

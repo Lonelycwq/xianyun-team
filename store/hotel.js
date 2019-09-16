@@ -50,13 +50,4 @@ export const mutations = {
   setChangeRemarkerData(state,data) {
     state.changeRemarkerData = data
   }
-  // ,
-  // 卸载组件时清除store
-  // clearData(state) {
-  //   state.hotelData = {},
-  //   state.scenicDisArr = [],
-  //   state.trafficDisArr = [],
-  //   state.displayArr = []
-  // }
-  
 }

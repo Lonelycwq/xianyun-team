@@ -1,6 +1,8 @@
 // 用户管理
 export const state = () => {
     return {
+        // 评论回复存的上一级对象
+        followObj:{},
         // 文章草稿数组
         draftPost:[],
         // 当前草稿文章
@@ -9,6 +11,11 @@ export const state = () => {
 }
 
 export const mutations = {
+    // 存放评论回复上一级对象的方法
+    setFollowObj(state, obj){
+        // 把文章草稿添加到数组
+        state.followObj = obj
+    },
     // 修改文章草稿
     setDraftPost(state, draft){
         // 把文章草稿添加到数组

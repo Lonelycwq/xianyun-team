@@ -2,10 +2,10 @@
   <div id='box'>
   <div id="container" style="float:left">
   </div>
-    <el-tabs class="tab" v-model="activeName" style="float:right;padding: 0 0 0 20px;width:330px;" @tab-click="tabChangeDisplay">
+    <el-tabs class="tab" id="tab" v-model="activeName" style="float:right;padding: 0 0 0 20px;width:330px;" @tab-click="tabChangeDisplay">
     <el-tab-pane label="风景" name="scenic" class="scenic_bar">
       <ul class="tab_list">
-        <li class="tab_row"
+        <li class="tab_row" :id="'tab'+index"
           v-for="(item,index) in scenicDisArr"
           :key="index"
           @mouseenter="handleMouseEnter(item,index)"
@@ -47,24 +47,21 @@ export default {
     }
   },
   watch: {
+    // 01.监听地图显示的数据源
     '$store.state.hotel.displayArr'(newVal, oldVal){
-      this.loadMap()
+      this.loadMapToggle()
     },
-    '$store.state.hotel.changeLonData'(newVal, oldVal){
-      this.loadMapChange()
-      // console.log(this.$store.state.hotel.changeLonData,this.$store.state.hotel.changeLatData)
-      // this.setCenter(this.$store.state.hotel.changeLonData,this.$store.state.hotel.changeLatData)
-    },
+    // 监听鼠标触发的坐标（经度），监听经纬度一个即可
+    // '$store.state.hotel.changeLonData'(newVal, oldVal){
+    //   this.loadMapChangeCenter()
+    // },
+    // 02.监听鼠标触发的坐标（纬度）
     '$store.state.hotel.changeLatData'(newVal, oldVal){
-      this.loadMapChange()
-      // console.log(this.$store.state.hotel.changeLonData,this.$store.state.hotel.changeLatData)
-      // this.setCenter(this.$store.state.hotel.changeLonData,this.$store.state.hotel.changeLatData)
+      this.loadMapChangeCenter()
     }
   },
   mounted(){
       setTimeout( ()=>{
-      // this.activeName = this.$store.state.hotel.activeName
-      // console.log('能不能显示',this.$store.state.hotel.scenicDisArr)
       this.$store.commit('hotel/setDisplayArr', this.$store.state.hotel.scenicDisArr)
       // 进入页面加载初始地图,进入风景地图
       // ----------------------获取城市的基本数据-----------------------
@@ -100,12 +97,16 @@ export default {
         var marker
         var markList = []
         changeDispalyArr.forEach( (e,i) =>{
-          content = `<div class="marker">${i + 1}</div>`
+          if(i === 0){
+            content = `<div class="active">${i + 1}</div>`
+          } else {
+            content = `<div class="marker">${i + 1}</div>`
+          }
           marker = new AMap.Marker({
             content: content,  // 自定义点标记覆盖物内容
             position:  [e[0], e[1]], // 基点位置
             offset: new AMap.Pixel(-17, -42), // 相对于基点的偏移位置
-            title: `${e[2]}`
+            title: `${e[2]}`//设置title效果
           })
           markList.push(marker)
         })
@@ -122,14 +123,8 @@ export default {
       document.head.appendChild(api)
     },100)
   },
-  // destroyed(){
-  //   this.$store.commit('hotel/resetData')
-  // },
-  // updated(){
-  //   this.$store.commit('hotel/resetData')
-  // },
   methods:{
-    // 封装请求风景和交通的数据,并且处理好返回一个数组
+    // 01.封装请求风景和交通的数据（数组：[坐标、名称]）------内部调用 getLocation（）处理好数据，返回一个数组（数组：[坐标、名称、距离]）
     getData(city,arr,type){
           this.$axios({
             url:'https://restapi.amap.com/v3/place/text',
@@ -141,7 +136,7 @@ export default {
               output:'json',
               page:1,
               offset:10,
-              key:'5336cc746f984fbb06224c3c376f5252'
+              key:'ebefe2f9c5e80d46bd06bd011a6240ba'//每天2000使用额度，用完了会报错，请更换新的web服务的key
               }
           })
           .then( res=>{
@@ -162,6 +157,8 @@ export default {
                 })
                 this.scenicArr = scenicArr
                 // console.log("风景数据：",scenicArr)
+
+                // 调用方法获取风景名胜坐标数组
                 this.getLocation(this.scenicArr,'风景名胜')
               }else {
                 this.trafficData = data
@@ -178,12 +175,14 @@ export default {
                 })
                 this.trafficArr = trafficArr
                 // console.log("交通数据：",trafficArr)
+
+                // 调用方法获取交通设施服务坐标数组
                 this.getLocation(this.trafficArr,'交通设施服务')
               }
             }
           })
     },
-    // 处理获取两坐标间的距离，返回一个 “坐标，名称，距离”的数组封装方法
+    // 02.处理获取两坐标间的距离，返回一个数组（数组：[坐标、名称、距离]）
     getLocation(arrRoot,type){
       // 给个初始值，避免报错
       arrRoot = typeof(arrRoot)=== 'object' && arrRoot.length >=0 ? arrRoot : []
@@ -222,12 +221,10 @@ export default {
         // this.$store.commit('hotel/setDisplayArr', arrData)
       }
     },
-    // 切换显示地图数据
+    // 03.切换修改地图显示的数据源
     tabChangeDisplay(item){
       // console.log(item)
       this.activeName = item.paneName
-      // this.$store.commit('hotel/resetData')
-      // console.log(this.activeName)
       if(this.activeName === "scenic" ){
         // this.$store.commit('hotel/setScenicDisArr',this.scenicDisArr)
         this.$store.commit('hotel/setDisplayArr',this.scenicDisArr)
@@ -236,7 +233,8 @@ export default {
         this.$store.commit('hotel/setDisplayArr',this.trafficDisArr)
       }
     },
-    loadMap(){
+    // 04.进入页面时初始化地图
+    loadMapToggle(){
       // 进入页面加载初始地图,进入风景地图
       // ----------------------获取城市的基本数据-----------------------
       const { location } = this.$store.state.hotel.hotelData
@@ -266,17 +264,20 @@ export default {
           })
         // ----------------------添加点标记-----------------------
         // 遍历数组进行生成点标记
-        var temp =[]
         var content
         var marker
         var markList = []
         changeDispalyArr.forEach( (e,i) =>{
-          content = `<div class="marker">${i + 1}</div>`
+          if(i === 0){
+            content = `<div class="active">${i + 1}</div>`
+          } else {
+            content = `<div class="marker">${i + 1}</div>`
+          }
           marker = new AMap.Marker({
             content: content,  // 自定义点标记覆盖物内容
             position:  [e[0], e[1]], // 基点位置
             offset: new AMap.Pixel(-17, -42), // 相对于基点的偏移位置
-            title: `${e[2]}`
+            title: `${e[2]}`//设置title效果
           })
           markList.push(marker)
         })
@@ -292,6 +293,7 @@ export default {
       api.src = url
       document.head.appendChild(api)
     },
+    // v1版（仅供参考）
     loadMapChange(){
       // 进入页面加载初始地图,进入风景地图
       // ----------------------获取城市的基本数据-----------------------
@@ -326,6 +328,11 @@ export default {
             zoom: 12,//级别
             center: [lonCenter, latCenter],//中心点坐标
           })
+
+        // AMap.event.addDomListener(document.getElementsByClassName('tab_row'), 'mouseover', function() {
+        // map.panTo([lonCenter, lonCenter])
+        // })
+
         // ----------------------添加点标记-----------------------
         // 遍历数组进行生成点标记
         var temp =[]
@@ -342,7 +349,7 @@ export default {
             content: content,  // 自定义点标记覆盖物内容
             position:  [e[0], e[1]], // 基点位置
             offset: new AMap.Pixel(-17, -42), // 相对于基点的偏移位置
-            title: `${e[2]}`
+            title: `${e[2]}`//设置title效果
           })
           markList.push(marker)
         })
@@ -358,22 +365,60 @@ export default {
       api.src = url
       document.head.appendChild(api)
     },
+    // 05.动态修改地图的中心点的坐标，实现地图移动
+    loadMapChangeCenter(){
+      // ----------------------获取城市的基本数据-----------------------
+      // 构建动态坐标
+      var _lonCenter = this.$store.state.hotel.changeLonData
+      var _latCenter = this.$store.state.hotel.changeLatData
+      var _index = this.$store.state.hotel.changeRemarkerData
+      var changeDispalyArr = this.$store.state.hotel.displayArr
+      // ----------------------构建地图部分-----------------------
+        var lonCenter = _lonCenter
+        var latCenter = _latCenter
+        var map =  new AMap.Map('container',
+          {
+            zoom: 12,//级别
+            center: [lonCenter, latCenter],//中心点坐标
+          })
+        // 方法一：
+        AMap.event.addDomListener(document.getElementById(`tab${_index}`), 'mouseover', function() {
+          map.panTo([lonCenter, latCenter])
+        })
+        // 方法二：
+        // document.querySelector(`#tab${_index}`).onmouseover = function() {
+        //   map.setCenter([lonCenter, latCenter])
+        // }
+
+        // ----------------------添加点标记-----------------------
+        // 遍历数组进行生成点标记
+        var content
+        var marker
+        var markList = []
+        changeDispalyArr.forEach( (e,i) =>{
+          if(i === _index){
+            content = `<div class="active">${i + 1}</div>`
+          } else {
+            content = `<div class="marker">${i + 1}</div>`
+          }
+          marker = new AMap.Marker({
+            content: content,  // 自定义点标记覆盖物内容
+            position:  [e[0], e[1]], // 基点位置
+            offset: new AMap.Pixel(-17, -42), // 相对于基点的偏移位置
+            title: `${e[2]}`//设置title效果
+          })
+          markList.push(marker)
+        })
+          // 将创建的点标记添加到已有的地图实例：
+          map.add(markList)
+          // 移除已创建的 marker
+          // map.remove(marker)
+    },
+    // 06.鼠标移入时触发，修改store里面的坐标数据
     handleMouseEnter(item,index){
       this.$store.commit('hotel/setChangeLonData',item[0])
       this.$store.commit('hotel/setChangeLatData',item[1])
       this.$store.commit('hotel/setChangeRemarkerData',index)
-    },
-    setCenter(lon,lat){
-      window.onLoad  = function(){
-      var map =  new AMap.Map('container',
-          {
-            zoom: 12,//级别
-            // center: [lonCenter, latCenter],//中心点坐标
-          })
-      var position = new AMap.LngLat(lon, lat)  // 标准写法
-      // 简写 var position = [116, 39]; 
-      map.setCenter(position)
-      }
     }
   }
 }
