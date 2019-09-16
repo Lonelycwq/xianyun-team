@@ -100,7 +100,11 @@ export default {
         var marker
         var markList = []
         changeDispalyArr.forEach( (e,i) =>{
-          content = `<div class="marker">${i + 1}</div>`
+          if(i === 0){
+            content = `<div class="active">${i + 1}</div>`
+          } else {
+            content = `<div class="marker">${i + 1}</div>`
+          }
           marker = new AMap.Marker({
             content: content,  // 自定义点标记覆盖物内容
             position:  [e[0], e[1]], // 基点位置
@@ -141,7 +145,7 @@ export default {
               output:'json',
               page:1,
               offset:10,
-              key:'5336cc746f984fbb06224c3c376f5252'
+              key:'55d9c901fc7e39012720304c9e599960'//每天2000使用额度，用完了会报错，请更换新的web服务的key
               }
           })
           .then( res=>{
@@ -271,7 +275,11 @@ export default {
         var marker
         var markList = []
         changeDispalyArr.forEach( (e,i) =>{
-          content = `<div class="marker">${i + 1}</div>`
+          if(i === 0){
+            content = `<div class="active">${i + 1}</div>`
+          } else {
+            content = `<div class="marker">${i + 1}</div>`
+          }
           marker = new AMap.Marker({
             content: content,  // 自定义点标记覆盖物内容
             position:  [e[0], e[1]], // 基点位置
