@@ -125,7 +125,6 @@
                   :key="num"
                 ></i>
               </span>
-
               <!-- <i></i>
               <i></i>-->
               <span class="pinyin">{{item.hoteltype.name}}</span>
@@ -175,19 +174,23 @@
           </el-row>
         </div>
       </div>
+      <!-- 分页 -->
+      <el-pagination
+        small
+        @current-change="handleCurrentChange"
+        :current-page="pageIndex"
+        :page-size="pageSize"
+        layout="prev, pager, next"
+        :total="total"
+        prev-text="上一页"
+        next-text="下一页"
+      ></el-pagination>
+    </div>
+    <!-- 加载 -->
+    <div v-else-if="dataList.length === 0" style="text-align:center">
+      <img src="http://157.122.54.189:9093/images/loading.gif" />
     </div>
     <div v-else>没有找到相应的酒店</div>
-    <!-- 分页 -->
-    <el-pagination
-      small
-      @current-change="handleCurrentChange"
-      :current-page="pageIndex"
-      :page-size="pageSize"
-      layout="prev, pager, next"
-      :total="total"
-      prev-text="上一页"
-      next-text="下一页"
-    ></el-pagination>
   </div>
 </template>
 
@@ -243,21 +246,19 @@ export default {
       if (Object.keys(this.$route.query).indexOf("hotellevel") == -1) {
         url = `${url}&hotellevel=${parseInt(val)}`;
       } else {
-        
         let query = this.$router.history.current.query;
         let path = this.$router.history.current.path;
         this.$router.push({
           path,
           query: {
             city: 74,
-            hotellevel: parseInt(val),
+            hotellevel: parseInt(val)
             // price_lt: this.value2
           }
         });
         // url.replace(`hoteltype=${this.$route.query.hoteltype}`,`hoteltype=${val}`)
       }
-        this.$router.push(url);
-
+      this.$router.push(url);
     },
     //酒店类型
     handleTypes(val) {
@@ -274,7 +275,7 @@ export default {
           path,
           query: {
             city: 74,
-            hoteltype: parseInt(val.id),
+            hoteltype: parseInt(val.id)
             // price_lt: this.value2
           }
         });
@@ -296,7 +297,7 @@ export default {
           path,
           query: {
             city: 74,
-            hotelasset: parseInt(val.id),
+            hotelasset: parseInt(val.id)
             // price_lt: this.value2
           }
         });
@@ -316,7 +317,7 @@ export default {
           path,
           query: {
             city: 74,
-            hotelbrand: parseInt(val.id),
+            hotelbrand: parseInt(val.id)
             // price_lt: this.value2
           }
         });
