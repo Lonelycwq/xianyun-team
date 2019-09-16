@@ -9,7 +9,7 @@
           </el-row>
           <!-- 滑条 -->
           <el-row>
-            <el-slider v-model="value2" :max="4000"></el-slider>
+            <el-slider v-model="value3" :max="4000"></el-slider>
           </el-row>
         </el-col>
         <!-- 住宿等级 -->
@@ -203,7 +203,7 @@ export default {
       hotelOption: {},
       products: [],
       //滑条
-      value2: 4000,
+      value3: 4000,
       //多选条件
       levels: null, // 酒店等级
       types: null, // 酒店类型
@@ -233,7 +233,7 @@ export default {
         url: "/hotels",
         params: this.$route.query
       }).then(res => {
-        console.log(res);
+        // console.log(res);
         this.fliterList = { ...this.dataList };
         this.dataList = res.data.data;
       });
@@ -514,7 +514,7 @@ export default {
       url: "/hotels/options"
     }).then(res => {
       this.hotelOption = res.data.data;
-      console.log(this.hotelOption);
+      // console.log(this.hotelOption);
       setTimeout(() => {
         this.setIndex();
       }, 10);
