@@ -268,14 +268,9 @@ export default {
     },
     // 传递数据给酒店详情页
     handleHotelData(data) {
-<<<<<<< HEAD
       this.$store.commit("hotel/setHotelData", data)
       this.$store.commit('hotel/resetData')
       this.loadMap()
-      // console.log(data);
-=======
-      this.$store.commit("hotel/setHotelData", data);
->>>>>>> a08480c35b5f300e60ab1155b362617fa664d109
       const { id, name } = data;
       this.$router.push({
         path: "/hotel/detail",
@@ -295,10 +290,8 @@ export default {
     setIndex() {
       this.total = this.data.length;
       this.dataList = this.data.slice(0, this.pageSize);
-<<<<<<< HEAD
-      // console.log(this.dataList)
     },
-    // ----------------------预先加载酒店详情页的数据-------------------------
+      // ----------------------预先加载酒店详情页的数据-------------------------
     // 封装请求风景和交通的数据,并且处理好返回一个数组
     getData(city,arr,type){
           this.$axios({
@@ -448,8 +441,6 @@ export default {
       api.charset ='utf-8'
       api.src = url
       document.head.appendChild(api)
-=======
->>>>>>> a08480c35b5f300e60ab1155b362617fa664d109
     }
   },
   mounted() {

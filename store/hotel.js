@@ -9,7 +9,13 @@ export const state = () => {
     // 用来显示地图的数据
     displayArr: [],
     // tab栏的显示状态
-    activeName: 'scenic'
+    activeName: 'scenic',
+    // 动态经度坐标
+    changeLonData: 0,
+    // 动态纬度坐标
+    changeLatData: 0,
+    // 动态点标记数字
+    changeRemarkerData: 0
   }
 }
 export const mutations = {
@@ -31,6 +37,18 @@ export const mutations = {
   },
   resetData(state) {
     state.activeName = 'scenic'
+  },
+  // 设置经度坐标
+  setChangeLonData(state,data) {
+    state.changeLonData = data
+  },
+  // 设置纬度坐标
+  setChangeLatData(state,data) {
+    state.changeLatData = data
+  },
+  // 设置动态点标记
+  setChangeRemarkerData(state,data) {
+    state.changeRemarkerData = data
   }
   // ,
   // 卸载组件时清除store
