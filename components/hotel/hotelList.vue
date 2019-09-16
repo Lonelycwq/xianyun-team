@@ -48,7 +48,7 @@
                 <el-dropdown-item
                   v-for="(item,index) in hotelOption.types"
                   :key="index"
-                  :command="item.name"
+                  :command="{name:item.name,id:item.id}"
                 >{{item.name}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -69,7 +69,7 @@
                 <el-dropdown-item
                   v-for="(item,index) in hotelOption.assets"
                   :key="index"
-                  :command="item.name"
+                  :command="{name:item.name,id:item.id}"
                 >{{item.name}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -93,7 +93,7 @@
                 <el-dropdown-item
                   v-for="(item,index) in hotelOption.brands"
                   :key="index"
-                  :command="item.name"
+                  :command="{name:item.name,id:item.id}"
                 >{{item.name}}</el-dropdown-item>
               </el-dropdown-menu>
             </el-dropdown>
@@ -212,25 +212,26 @@ export default {
       pageSize: 5,
       pageIndex: 1,
       dataList: [],
-      fliterList:[]
+      fliterList: [],
+      value: 0
     };
   },
   props: {
     data: {
-      type: Object,
+      type: Array,
       default: 0
     }
   },
   watch: {
     $route(to, from) {
-      console.log(this.$route);
+      // console.log(this.$route);
       this.$axios({
         url: "/hotels",
         params: this.$route.query
       }).then(res => {
         console.log(res);
-        this.fliterList = {...this.dataList}
-        this.dataList = res.data.data
+        this.fliterList = { ...this.dataList };
+        this.dataList = res.data.data;
       });
     }
   },
@@ -240,37 +241,92 @@ export default {
       this.levels = val;
       let url = this.$route.fullPath;
       if (Object.keys(this.$route.query).indexOf("hotellevel") == -1) {
-        // console.log(111);
-        url = `${url}&hotellevel=${parseInt(val)}&price_lt=${this.value2}`;
+        url = `${url}&hotellevel=${parseInt(val)}`;
+      } else {
+        
+        let query = this.$router.history.current.query;
+        let path = this.$router.history.current.path;
+        this.$router.push({
+          path,
+          query: {
+            city: 74,
+            hotellevel: parseInt(val),
+            // price_lt: this.value2
+          }
+        });
+        // url.replace(`hoteltype=${this.$route.query.hoteltype}`,`hoteltype=${val}`)
+      }
+        this.$router.push(url);
+
+    },
+    //酒店类型
+    handleTypes(val) {
+      this.types = val.name;
+      let url = this.$route.fullPath;
+      // console.log(val)
+      if (Object.keys(this.$route.query).indexOf("hoteltype") == -1) {
+        url = `${url}&hoteltype=${parseInt(val.id)}`;
         this.$router.push(url);
       } else {
         let query = this.$router.history.current.query;
         let path = this.$router.history.current.path;
-        console.log(query, path);
-        this.$router.push({ path, query: {
-          city:74,
-          hotellevel:parseInt(val),
-          price_lt:this.value2
-        } });
+        this.$router.push({
+          path,
+          query: {
+            city: 74,
+            hoteltype: parseInt(val.id),
+            // price_lt: this.value2
+          }
+        });
       }
-    },
-    //酒店类型
-    handleTypes(val) {
-      this.types = val;
     },
     //酒店设施
     handleAssets(val) {
-      this.assets = val;
+      this.assets = val.name;
+      // console.log(val);
+      let url = this.$route.fullPath;
+      // console.log(val)
+      if (Object.keys(this.$route.query).indexOf("hotelasset") == -1) {
+        url = `${url}&hotelasset=${parseInt(val.id)}`;
+        this.$router.push(url);
+      } else {
+        let query = this.$router.history.current.query;
+        let path = this.$router.history.current.path;
+        this.$router.push({
+          path,
+          query: {
+            city: 74,
+            hotelasset: parseInt(val.id),
+            // price_lt: this.value2
+          }
+        });
+      }
     },
     //酒店品牌
     handleBrands(val) {
-      this.brands = val;
+      this.brands = val.name;
+      let url = this.$route.fullPath;
+      if (Object.keys(this.$route.query).indexOf("hotelbrand") == -1) {
+        url = `${url}&hotelbrand=${parseInt(val.id)}`;
+        this.$router.push(url);
+      } else {
+        let query = this.$router.history.current.query;
+        let path = this.$router.history.current.path;
+        this.$router.push({
+          path,
+          query: {
+            city: 74,
+            hotelbrand: parseInt(val.id),
+            // price_lt: this.value2
+          }
+        });
+      }
     },
     // 传递数据给酒店详情页
     handleHotelData(data) {
-      this.$store.commit("hotel/setHotelData", data)
-      this.$store.commit('hotel/resetData')
-      this.loadMap()
+      this.$store.commit("hotel/setHotelData", data);
+      this.$store.commit("hotel/resetData");
+      this.loadMap();
       const { id, name } = data;
       this.$router.push({
         path: "/hotel/detail",
@@ -291,160 +347,163 @@ export default {
       this.total = this.data.length;
       this.dataList = this.data.slice(0, this.pageSize);
     },
-      // ----------------------预先加载酒店详情页的数据-------------------------
+    // ----------------------预先加载酒店详情页的数据-------------------------
     // 封装请求风景和交通的数据,并且处理好返回一个数组
-    getData(city,arr,type){
-          this.$axios({
-            url:'https://restapi.amap.com/v3/place/text',
-            params:{
-              keyword:'',
-              city:city,
-              location:arr,
-              types:type,
-              output:'json',
-              page:1,
-              offset:10,
-              key:'55d9c901fc7e39012720304c9e599960'//每天2000使用额度，用完了会报错，请更换新的web服务的key
-              }
-          })
-          .then( res=>{
-            if(res.status === 200){
-              const { data } = res
-              if(type==='风景名胜'){
-                this.scenicData = data
-                const { pois } = data
-                var scenicArr = []
-                var arr = []
-                pois.forEach( e => {
-                  const { location , name } = e
-                  arr = location.split(',').map( m =>{
-                    return +m
-                  })
-                  arr.unshift(name)
-                  scenicArr.push(arr)
-                })
-                this.scenicArr = scenicArr
-                // console.log("风景数据：",scenicArr)
-                this.getLocation(this.scenicArr,'风景名胜')
-              }else {
-                this.trafficData = data
-                const { pois } = data
-                var trafficArr = []
-                var arr = []
-                pois.forEach( e => {
-                  const { location , name } = e
-                  arr = location.split(',').map( m =>{
-                    return +m
-                  })
-                  arr.unshift(name)
-                  trafficArr.push(arr)
-                })
-                this.trafficArr = trafficArr
-                // console.log("交通数据：",trafficArr)
-                this.getLocation(this.trafficArr,'交通设施服务')
-              }
-            }
-          })
+    getData(city, arr, type) {
+      this.$axios({
+        url: "https://restapi.amap.com/v3/place/text",
+        params: {
+          keyword: "",
+          city: city,
+          location: arr,
+          types: type,
+          output: "json",
+          page: 1,
+          offset: 10,
+          key: "55d9c901fc7e39012720304c9e599960" //每天2000使用额度，用完了会报错，请更换新的web服务的key
+        }
+      }).then(res => {
+        if (res.status === 200) {
+          const { data } = res;
+          if (type === "风景名胜") {
+            this.scenicData = data;
+            const { pois } = data;
+            var scenicArr = [];
+            var arr = [];
+            pois.forEach(e => {
+              const { location, name } = e;
+              arr = location.split(",").map(m => {
+                return +m;
+              });
+              arr.unshift(name);
+              scenicArr.push(arr);
+            });
+            this.scenicArr = scenicArr;
+            // console.log("风景数据：",scenicArr)
+            this.getLocation(this.scenicArr, "风景名胜");
+          } else {
+            this.trafficData = data;
+            const { pois } = data;
+            var trafficArr = [];
+            var arr = [];
+            pois.forEach(e => {
+              const { location, name } = e;
+              arr = location.split(",").map(m => {
+                return +m;
+              });
+              arr.unshift(name);
+              trafficArr.push(arr);
+            });
+            this.trafficArr = trafficArr;
+            // console.log("交通数据：",trafficArr)
+            this.getLocation(this.trafficArr, "交通设施服务");
+          }
+        }
+      });
     },
     // 处理获取两坐标间的距离，返回一个 “坐标，名称，距离”的数组封装方法
-    getLocation(arrRoot,type){
+    getLocation(arrRoot, type) {
       // 给个初始值，避免报错
-      arrRoot = typeof(arrRoot)=== 'object' && arrRoot.length >=0 ? arrRoot : []
-      const { location } =  this.$store.state.hotel.hotelData
+      arrRoot =
+        typeof arrRoot === "object" && arrRoot.length >= 0 ? arrRoot : [];
+      const { location } = this.$store.state.hotel.hotelData;
       // 获取城市坐标
-      var lat = location.latitude
-      var lon = location.longitude
-      var p1 = [lon, lat]
-      var arrData =[]
-      arrRoot.forEach( e =>{
-        const [ temp ,...locationArr ] = e
-        var newArr = [temp]
+      var lat = location.latitude;
+      var lon = location.longitude;
+      var p1 = [lon, lat];
+      var arrData = [];
+      arrRoot.forEach(e => {
+        const [temp, ...locationArr] = e;
+        var newArr = [temp];
         // 保留两位小数点
-        var distance = Math.round(AMap.GeometryUtil.distance(p1,locationArr) /10)/100
-        if(String(distance).length === 2){
-          distance = String(distance).concat(".00")
-        } else if(String(distance).length === 4){
-          distance = String(distance).concat('0')
+        var distance =
+          Math.round(AMap.GeometryUtil.distance(p1, locationArr) / 10) / 100;
+        if (String(distance).length === 2) {
+          distance = String(distance).concat(".00");
+        } else if (String(distance).length === 4) {
+          distance = String(distance).concat("0");
         } else {
-          distance
+          distance;
         }
         // 添加坐标数据
-        newArr.unshift(...locationArr)
+        newArr.unshift(...locationArr);
         // 添加距离值
-        newArr.push(distance)
+        newArr.push(distance);
         // 加入数组中
-        arrData.push(newArr)
-      })
-      if(type === "风景名胜"){
-        this.scenicDisArr = arrData
-        this.$store.commit('hotel/setScenicDisArr', arrData)
+        arrData.push(newArr);
+      });
+      if (type === "风景名胜") {
+        this.scenicDisArr = arrData;
+        this.$store.commit("hotel/setScenicDisArr", arrData);
         // this.$store.commit('hotel/setDisplayArr', arrData)
       } else {
-        this.trafficDisArr = arrData
-        this.$store.commit('hotel/setTrafficDisArr', arrData)
+        this.trafficDisArr = arrData;
+        this.$store.commit("hotel/setTrafficDisArr", arrData);
         // this.$store.commit('hotel/setDisplayArr', arrData)
       }
-    }
-    ,
-    loadMap(){
+    },
+    loadMap() {
       // 进入页面加载初始地图,进入风景地图
       // ----------------------获取城市的基本数据-----------------------
-      const { location } = this.$store.state.hotel.hotelData
+      const { location } = this.$store.state.hotel.hotelData;
       // 获取城市坐标
-      var lat = location.latitude
-      var lon = location.longitude
+      var lat = location.latitude;
+      var lon = location.longitude;
       // 获取城市
-      var city =  this.$store.state.hotel.hotelData.real_city
+      var city = this.$store.state.hotel.hotelData.real_city;
       // 采用闭包缓存数据，否则遍历的时候会报错
-      var changeDispalyArr = this.$store.state.hotel.displayArr
+      var changeDispalyArr = this.$store.state.hotel.displayArr;
       // ----------------------获取初始数据-----------------------
-      var cityLocationArr = [lon,lat]
+      var cityLocationArr = [lon, lat];
       // 获取风景数据
-      this.getData(city,cityLocationArr,'风景名胜')
+      this.getData(city, cityLocationArr, "风景名胜");
       // 获取交通数据
-      this.getData(city,cityLocationArr,'交通设施服务')
+      this.getData(city, cityLocationArr, "交通设施服务");
       // ----------------------构建地图部分-----------------------
-      window.onLoad  = function(){
-        changeDispalyArr = typeof(changeDispalyArr)=== 'object' && changeDispalyArr.length >=0 ? changeDispalyArr : [[ , ]]
+      window.onLoad = function() {
+        changeDispalyArr =
+          typeof changeDispalyArr === "object" && changeDispalyArr.length >= 0
+            ? changeDispalyArr
+            : [[,]];
         //中心点坐标
-        var lonCenter = changeDispalyArr[0][0]
-        var latCenter = changeDispalyArr[0][1]
-        var map =  new AMap.Map('container',
-          {
-            zoom: 12,//级别
-            center: [lonCenter, latCenter],//中心点坐标
-          })
+        var lonCenter = changeDispalyArr[0][0];
+        var latCenter = changeDispalyArr[0][1];
+        var map = new AMap.Map("container", {
+          zoom: 12, //级别
+          center: [lonCenter, latCenter] //中心点坐标
+        });
         // ----------------------添加点标记-----------------------
         // 遍历数组进行生成点标记
-        var temp =[]
-        var content
-        var marker
-        var markList = []
-        changeDispalyArr.forEach( (e,i) =>{
-          if(i === 0){
-            content = `<div class="active">${i + 1}</div>`
+        var temp = [];
+        var content;
+        var marker;
+        var markList = [];
+        changeDispalyArr.forEach((e, i) => {
+          if (i === 0) {
+            content = `<div class="active">${i + 1}</div>`;
           } else {
-            content = `<div class="marker">${i + 1}</div>`
+            content = `<div class="marker">${i + 1}</div>`;
           }
           marker = new AMap.Marker({
-            content: content,  // 自定义点标记覆盖物内容
-            position:  [e[0], e[1]], // 基点位置
+            content: content, // 自定义点标记覆盖物内容
+            position: [e[0], e[1]], // 基点位置
             offset: new AMap.Pixel(-17, -42), // 相对于基点的偏移位置
             title: `${e[2]}`
-          })
-          markList.push(marker)
-        })
-          // 将创建的点标记添加到已有的地图实例：
-          map.add(markList)
-          // 移除已创建的 marker
-          // map.remove(marker)
-      }
+          });
+          markList.push(marker);
+        });
+        // 将创建的点标记添加到已有的地图实例：
+        map.add(markList);
+        // 移除已创建的 marker
+        // map.remove(marker)
+      };
       // ----------------------配置基础文件-----------------------
-      var url =  'https://webapi.amap.com/maps?v=1.4.15&key=cedd1080cbba395ba9431a824814fec1&callback=onLoad'
-      var api =  document.createElement('script')
-      api.charset ='utf-8'
-      api.src = url
-      document.head.appendChild(api)
+      var url =
+        "https://webapi.amap.com/maps?v=1.4.15&key=cedd1080cbba395ba9431a824814fec1&callback=onLoad";
+      var api = document.createElement("script");
+      api.charset = "utf-8";
+      api.src = url;
+      document.head.appendChild(api);
     }
   },
   mounted() {
@@ -453,7 +512,7 @@ export default {
       url: "/hotels/options"
     }).then(res => {
       this.hotelOption = res.data.data;
-      // console.log(this.hotelOption);
+      console.log(this.hotelOption);
       setTimeout(() => {
         this.setIndex();
       }, 10);
