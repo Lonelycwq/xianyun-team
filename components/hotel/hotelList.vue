@@ -187,10 +187,10 @@
       ></el-pagination>
     </div>
     <!-- 加载 -->
-    <div v-else-if="dataList.length === 0" style="text-align:center">
+    <div v-if="dataList.length === 0 && (isShow = !isShow)" style="text-align:center">
       <img src="http://157.122.54.189:9093/images/loading.gif" />
     </div>
-    <div v-else>没有找到相应的酒店</div>
+    <div v-if='dataList.length === 0 && !isShow'>没有找到相应的酒店</div>
   </div>
 </template>
 
@@ -198,6 +198,7 @@
 export default {
   data() {
     return {
+      isShow:false,
       //酒店选项
       hotelOption: {},
       products: [],
