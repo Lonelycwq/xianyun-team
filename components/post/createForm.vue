@@ -249,7 +249,7 @@ export default {
       this.addPostInfo.city = null;
       this.addPostInfo.content = "";
       // 遍历数组
-      arrDraft.forEach((e,i)=>{
+      /* arrDraft.forEach((e,i)=>{
         if(e.draftId === this.item.draftId){
         let newDraft = arrDraft.splice(i,1,{
           ...this.addPostInfo,
@@ -259,7 +259,7 @@ export default {
         // 调用store里的方法
         this.$store.commit('post/setNowDraft',newDraft)
         }
-      })
+      }) */
     }
   },
   mounted(){
